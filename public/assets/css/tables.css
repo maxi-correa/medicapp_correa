@@ -1,0 +1,32 @@
+.tabla-contenedor {
+    max-height: 400px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--dark-blue);
+    vertical-align: middle;
+}
+
+th {
+    color: white;
+    background-color: var(--dark-blue);
+}
+
+tr:hover {
+    background-color: var(--light-blue);
+}

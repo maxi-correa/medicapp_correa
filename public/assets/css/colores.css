@@ -1,0 +1,32 @@
+.violeta {
+    background: var(--purple) !important;
+}
+
+.azul {
+    background: var(--dark-blue) !important;
+}
+
+.celeste {
+    background: var(--light-blue) !important;
+}
+
+.gris {
+    background: var(--light-gray) !important;
+}
+
+.gris-oscuro {
+    background: var(--dark-gray) !important;
+}
+
+.rojo {
+    background: var(--red) !important;
+}
+
+.verde {
+    background: var(--green) !important;
+}
+
+.blanco {
+    background: var(--white) !important;
+}
+

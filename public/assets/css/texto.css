@@ -1,0 +1,51 @@
+/* FUENTES */
+
+/* Raleway */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+.texto-violeta {
+    color: var(--purple) !important;
+}
+
+.texto-azul {
+    color: var(--dark-blue) !important;
+}
+
+.texto-celeste {
+    color: var(--light-blue) !important;
+}
+
+.texto-gris {
+    color: var(--light-gray) !important;
+}
+
+.texto-rojo {
+    color: var(--red) !important;
+}
+
+.texto-verde {
+    color: var(--green) !important;
+}
+
+.texto-blanco {
+    color: var(--white) !important;
+}
+
+.texto-pequenio{
+    font-size: small; 
+}
+
+.texto-grande{
+    font-size: large;
+}
+
+.texto-mediano{
+    font-size: medium;
+}
+
+.raleway {
+    font-family: "Raleway";
+}
+
+

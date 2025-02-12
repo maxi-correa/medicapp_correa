@@ -1,0 +1,25 @@
+
+.aref {
+    background-color: #80a828; /* Color de fondo */
+    border: none; /* Sin borde */
+    color: white; /* Color del texto */
+    padding: 15px 32px; /* Espaciado interno */
+    text-align: center; /* Centrar el texto */
+    text-decoration: none; /* Sin subrayado */
+    display: inline-block; /* Permitir margen */
+    font-size: 16px; /* Tamaño de fuente */
+    margin: 4px 2px; /* Margen */
+    cursor: pointer; /* Cambiar cursor */
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+.aref:hover {
+    background-color: #6f9f1a; /* Color de fondo al pasar el ratón */
+    color: white;
+}
+
+/* Evita el color azul del enlace */
+.btn:focus, .btn:active {
+    color: white; /* Mantiene el color del texto */
+    outline: none; /* Sin contorno */
+}

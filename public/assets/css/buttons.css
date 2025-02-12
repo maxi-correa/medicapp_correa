@@ -1,0 +1,23 @@
+button, a {
+    display: inline-flex;          
+    justify-content: center;    
+    align-items: center;           
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer; 
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    min-width: 100px;              
+    box-sizing: border-box;  
+}
+
+button {
+    border: none;
+}
+
+button:hover, a:hover {
+    opacity: 0.6; 
+    color: white;
+    text-decoration: none;
+}

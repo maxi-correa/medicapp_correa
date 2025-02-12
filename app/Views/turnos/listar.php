@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Medicapp - Listado Turnos</title>
+    <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap/sb-admin-2.min.css');?>" >
+        <link rel="stylesheet" href="<?= base_url('assets/css/bootstrap/bootstrap.css');?>" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/layout.css">
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css">
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
+    <!-- <link rel="stylesheet" href="/medicapp_dev/public/assets/css/tables.css"> -->
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/divs.css">
+    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/texto.css">
+    <link rel="stylesheet" href="<?= base_url('assets/css/dataTable.css');?>">
+</head>
+
+<body>
+    <header class="header" style="margin-bottom: 5%;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
+            <h1 class="navbar-brand ms-3">MEDICAPP</h1>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <?php
+                    $menu = session()->get('menu');
+                    
+                    if (!empty($menu)):
+                        foreach ($menu as $item): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= $item['url'] ?>"><?= $item['label'] ?></a>
+                            </li>
+                        <?php endforeach;
+                    else: ?>
+                        <li class="nav-item"><a class="nav-link">No hay opciones de menú disponibles.</a></li>
+                    <?php endif; ?>
+
+                    <li class="nav-item">
+                        <span class="nav-link"><?php echo session()->get('nombre'); ?> <?php echo session()->get('apellido'); ?></span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link"><?php echo session('rol'); ?></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('salir') ?>"><i class="fas fa-sign-out-alt"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="contenido-columna">
+            <h1 class="texto-negro text-center text-uppercase">Lista de Turnos</h1>
+            
+            <!-- Navegación entre semanas -->
+            <div class="container gris d-flex justify-content-center align-items-center" style="height: 4em;">
+                <div class="navegacion-semanas mb-3 d-flex justify-content-center align-items-center" style="margin: 0 !important;">
+                    <?php if ($semanaOffset > 0): ?>
+                        <a href="<?= site_url('turnos/listar/' . ($semanaOffset - 1)) ?>" class="btn verde texto-blanco font-weight-bold mr-4">← Anterior</a>
+                    <?php endif; ?>    
+                    <a href="<?= site_url('turnos/listar/' . ($semanaOffset + 1)) ?>" class="btn verde texto-blanco font-weight-bold">Siguiente →</a>
+                </div>
+            </div>
+
+            <!-- Aquí comienza la creación de tablas por día de la semana -->
+            <?php 
+                use Carbon\Carbon;
+                Carbon::setLocale('es');
+
+                $fechaActual = Carbon::today();
+                
+                foreach ($turnosPorDia as $fecha => $turnosDelDia): 
+                $fechaCarbon = Carbon::parse($fecha);
+                $diaSemana = $fechaCarbon->translatedFormat('l');
+                $fechaFormateada = $fechaCarbon->format('d/m/Y');
+                ?>
+                <div class=" violeta w-100 relaway text-uppercase">
+                    <div class="texto-blanco font-weight-bold relaway ml-3" style="margin:0; font-size: 28px;"><img src="<?= base_url('assets/img/calendario1.png') ?>" alt="icono de calendario" style="width: 30px;" class="mr-3 mb-1"><?= ucfirst($diaSemana) ?> - <?=$fechaFormateada ?> </div>
+                </div>
+                <div class="tabla-contenedor w-100">
+                    <table class="tableListarTurnos w-100 table table-hover text-center texto-negro mb-5">
+                        <thead>
+                            <tr class="celeste">
+                                <th>Médico</th>
+                                <th>Paciente</th>
+                                <th>Hora</th>
+                                <th>Dirección</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($turnosDelDia)): ?>
+                                <?php foreach ($turnosDelDia as $turno): ?>
+                                    <tr>
+                                        <td class="font-weight-bold"><?= isset($turno->medico) ? esc($turno->medico) : 'N/A' ?></td>
+                                        <td><?= isset($turno->paciente) ? esc($turno->paciente) : 'N/A' ?></td>
+                                        <td><?= isset($turno->hora) ? \Carbon\Carbon::parse($turno->hora)->format('H:i') : 'N/A' ?></td>
+                                        <td><?= isset($turno->direccion) ? esc($turno->direccion) : 'N/A' ?></td>
+                                        <td>
+                                        <?= isset($turno->estado) ? esc($turno->estado) : 'N/A' ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5">No hay turnos para esta fecha.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 medicapp_dev. Todos los derechos reservados.</p>
+    </footer>
+    
+    <script src="<?= base_url('assets/js/jquery.min.js');?>"></script>
+    <script src="<?= base_url('assets/js/popper.min.js');?>"></script>
+    <script src="<?= base_url('assets/js/bootstrap.js');?>"></script>
+    <script src="<?= base_url('assets/js/bootstrap.min.js');?>"></script>
+    
+    <script src="<?= base_url('assets/js/dataTable/dataTable-2.1.8.js');?>"></script>
+</body>
+
+</html>

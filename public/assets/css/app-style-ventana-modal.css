@@ -1,0 +1,16 @@
+.img-certificado {
+    width: 350px; /* El ancho será el 50% del contenedor */
+    height: auto;
+}
+
+.modal-lg {
+    max-width: 70%; /* Hacer que el modal sea más grande */
+}
+
+.certificado-contenedor {
+    width: 42%;
+}
+
+#id-area-ae {
+    display: none;
+}
