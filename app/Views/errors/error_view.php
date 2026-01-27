@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medicapp - Error de Acceso</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/texto.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/divs.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/texto.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/divs.css">
 </head>
 
 <body class="gris">

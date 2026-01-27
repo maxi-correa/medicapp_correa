@@ -6,13 +6,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/layout.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/divs.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/form.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/texto.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/layout.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/divs.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/form.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/texto.css">
     <title>Medicapp - Inicio de Sesión</title>
 
     <style>

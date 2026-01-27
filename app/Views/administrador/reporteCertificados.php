@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <!-- Enlaces a los archivos CSS -->
   <link rel="stylesheet" href="<?= base_url('assets/css/app-style-tabla.css') ?>">
-  <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
-  <link rel="stylesheet" href="/medicapp_dev/public/assets/css/layout.css">
-  <link rel="stylesheet" href="/medicapp_dev/public/assets/css/navbar.css">
-  <!-- <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css"> -->
-  <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
+  <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
+  <link rel="stylesheet" href="/medicapp_correa/public/assets/css/layout.css">
+  <link rel="stylesheet" href="/medicapp_correa/public/assets/css/navbar.css">
+  <!-- <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css"> -->
+  <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
   <link rel="stylesheet" href="<?= base_url('assets/css/texto.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/dataTable.css'); ?>">
 
@@ -158,7 +158,7 @@
 
   <!-- Pie de página -->
   <footer class="footer p-3 mt-auto">
-    <p>&copy; 2024 medicapp_dev. Todos los derechos reservados.</p>
+    <p>&copy; 2024 medicapp_correa. Todos los derechos reservados.</p>
   </footer>
 
 </body>

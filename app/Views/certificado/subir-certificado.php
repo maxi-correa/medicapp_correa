@@ -13,16 +13,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- Enlaces a los archivos CSS -->
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/layout.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/navbar.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/alerts.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/divs.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/form.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/tables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/texto.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/layout.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/navbar.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/alerts.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/divs.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/form.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/tables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/texto.css">
     <style>
         /* Estilos para ocultar las flechas */
         input[type="number"]::-webkit-outer-spin-button,

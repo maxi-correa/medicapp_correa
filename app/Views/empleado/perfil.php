@@ -12,14 +12,14 @@
     <!-- Enlace a Font Awesome para el icono de cierre de sesión -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Enlaces a los archivos CSS -->
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/variables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/layout.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/buttons.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/colores.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/texto.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/alerts.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/tables.css">
-    <link rel="stylesheet" href="/medicapp_dev/public/assets/css/divs.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/layout.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/texto.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/alerts.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/tables.css">
+    <link rel="stylesheet" href="/medicapp_correa/public/assets/css/divs.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
@@ -169,7 +169,7 @@
     <!--###################################################################################################################################-->
     <!-- Pie de página -->
     <footer class="footer">
-        <p>&copy; 2024 medicapp_dev. Todos los derechos reservados.</p>
+        <p>&copy; 2024 medicapp_correa. Todos los derechos reservados.</p>
     </footer>
 
     <!-- jQuery primero, después Popper.js, luego Bootstrap JS -->
