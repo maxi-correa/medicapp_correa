@@ -86,8 +86,8 @@ class CertificadoController extends BaseController
         $ruta = WRITEPATH . 'certificados/' . $legajo;
 
         // Si la carpeta con el legajo del empleado no existe la crea
-        if (!file_exists($ruta)) {
-            mkdir($ruta, 0777, false);
+        if (!is_dir($ruta)) { //is_dir — Devuelve true si el nombre del archivo existe y es un directorio
+            mkdir($ruta, 0777, false); // 0777 significa permisos de lectura, escritura y ejecución para todos. False significa que no se crearán carpetas padre automáticamente.
         }
 
 
@@ -101,7 +101,7 @@ class CertificadoController extends BaseController
         $certificadosDelCasoActual = $this->certificadoModel->getCertificadosPorNumeroTramite($numeroTramiteDeCasoActual);
 
         if ($empleadoCategoria['diasDisponibles'] >= $diasReposo) {
-            $casoActual['idEstado'] = 1; # CASO PENDIENTEE 
+            $casoActual['idEstado'] = 1; # CASO PENDIENTE
             $casoActual['tipoCategoriaVigente'] = $tipoCategoriaVigente;
             $this->casoModel->update($numeroTramiteDeCasoActual, $casoActual);
             $data =

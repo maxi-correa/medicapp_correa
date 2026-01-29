@@ -90,11 +90,11 @@ $routes->group('', ['filter' => 'EmpleadoFilter'], function ($routes) {
     $routes->get('/registrar-caso', 'CasoController::registrarCaso');
     $routes->post('/registrar-caso', 'CasoController::validar');
     #.................................................Ver caso 
-    $routes->get('visualizarCasoE', 'CasoController::mostrarUnCasoEmpleado');
+    $routes->get('/visualizarCasoE', 'CasoController::mostrarUnCasoEmpleado');
     #..............................................Certificado
-    $routes->get('certificado', 'CertificadoController::formulario');
-    $routes->post('certificado', 'CertificadoController::validar_formulario');
-    $routes->get('certificado/(:num)', 'CertificadoController::verImagen/$1');
+    $routes->get('/certificado', 'CertificadoController::formulario');
+    $routes->post('/certificado', 'CertificadoController::validar_formulario');
+    $routes->get('/certificado/(:num)', 'CertificadoController::verImagen/$1');
     $routes->get('/buscarMedico/(:num)', 'CertificadoController::buscarMedico/$1');
     $routes->get('/verificardias/(:num)/(:num)', 'CertificadoController::verificarDias/$1/$2');
 });
