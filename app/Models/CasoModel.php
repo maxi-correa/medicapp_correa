@@ -67,7 +67,7 @@ class CasoModel extends Model
 
     public function obtenerUnCaso($nroTramite)
     {
-        $sql = $this->db->query("SELECT DISTINCT c.numeroTramite, c.legajo, c.corresponde as tipoCertificado, CONCAT(em.nombre, ' ' ,em.apellido) as empleado, c.fechaInicio as fechaAusencia, c.lugarReposo,
+        $sql = $this->db->query("SELECT DISTINCT c.numeroTramite, c.legajo, c.corresponde as tipoCertificado, CONCAT(em.nombre, ' ' ,em.apellido) as empleado, c.fechaInicio as fechaAusencia, c.fechaFin, c.lugarReposo,
         c.motivo, tc.tiposeveridad, CONCAT(fr.nombre, ' ', fr.apellido) as pacienteFamiliar, 
         CASE WHEN c.corresponde = 'Familiar' THEN fr.dni ELSE em.dni END AS dniPaciente 
         FROM `casos` c INNER JOIN empleados_rrhh em on c.legajo= em.legajo 
@@ -126,7 +126,7 @@ class CasoModel extends Model
     */
     public function get_casos_por_legajo($legajo)
     {
-        $query = $this->db->query("SELECT c.numeroTramite, c.legajo, est.estado AS estadoCaso, c.motivo, c.fechaInicio as fechaAusencia, tipoCat.tipoSeveridad as severidadEnfermedad, CONCAT(medTrat.nombre, ' ', medTrat.apellido) AS medicoTratante, c.numeroTramite as personalCierre, c.numeroTramite as nombreCompEmpCierre
+        $query = $this->db->query("SELECT c.numeroTramite, c.legajo, est.estado AS estadoCaso, c.motivo, c.fechaInicio as fechaAusencia, c.fechaFin, tipoCat.tipoSeveridad as severidadEnfermedad, CONCAT(medTrat.nombre, ' ', medTrat.apellido) AS medicoTratante, c.numeroTramite as personalCierre, c.numeroTramite as nombreCompEmpCierre
     FROM casos as c
     JOIN estados as est ON c.idEstado = est.idEstado
     LEFT JOIN certificados as cert ON cert.numeroTramite = c.numeroTramite
