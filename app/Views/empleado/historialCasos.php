@@ -230,12 +230,14 @@
             <div class="encabezado-azul raleway d-flex justify-content-center align-items-center fw-bold texto-blanco">
                 CASOS FINALIZADOS
             </div>
+            
             <div class="table-responsive-md">
 
-                <table id="tableEmpleado" class="table table-hover texto-mediano raleway text-center  relaway w-100 p-3 ">
+            <!--
+            <table id="tableHistorial" class="table table-hover texto-mediano raleway text-center  relaway w-100 p-3 ">
                     <thead id="table-header">
                         <tr class="celeste">
-                            <th>CASO NÚMERO</th> <!-- Nueva columna para el contador -->
+                            <th>CASO NÚMERO</th>
                             <th>NRO TRÁMITE</th>
                             <th>RAZÓN DE CERTIFICADO</th>
                             <th>FECHA FINALIZADO</th>
@@ -244,7 +246,7 @@
                             <th>ESTADO DEL CERTIFICADO</th>
                             <th>SEVERIDAD</th>
                             <th>TURNO</th>
-                            <th><button class="toggle-tbody btn" onclick="desplegar('tableBodyFinalizados');">
+                            <th><button class="toggle-tbody btn" onclick="desplegar('tableBodyHistorial');">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
                                         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
                                     </svg>
@@ -252,13 +254,13 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="text-center" id="tableBodyFinalizados">
+                    <tbody class="text-center" id="tableBodyHistorial">
                         <?php if ($casosFinalizados): ?>
                             <?php $contador = 0; // Inicializamos un contador 
                             ?>
                             <?php foreach ($casosFinalizados as $caso): ?>
                                 <tr>       
-                                    <td><?= $contador++; ?></td> <!-- Mostramos el número del caso -->
+                                    <td><?= $contador++; ?></td>
                                     <td><?= $caso['numeroTramite']; ?></td>
                                     <td><?= $caso['tipoCertificado']; ?></td>
                                     <td><?= DateTime::createFromFormat("Y-m-d", $caso['fechaFin'])->format("d/m/Y"); ?></td>
@@ -288,17 +290,35 @@
                         <?php endif; ?>
                     </tbody>
                 </table>
-
-            </div> <!-- FIN Tabla responsiva !-->
-        </div>
+                        -->
+                <table id="tableHistorial" class="table table-hover texto-mediano raleway text-center w-100 p-3">
+                    <thead>
+                        <tr class="celeste">
+                            <th>ID</th>
+                            <th>NRO TRÁMITE</th>
+                            <th>RAZÓN DE CERTIFICADO</th>
+                            <th>FECHA FINALIZADO</th>
+                            <th>DISPONE CERTIFICADO</th>
+                            <th>CERTIFICADO</th>
+                            <th>ESTADO</th>
+                            <th>SEVERIDAD</th>
+                            <th>TURNO</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyHistorial"></tbody>
+                </table>
+                        </div> <!-- FIN Tabla responsiva !-->
+                    </div>
     </main>
 
     <?= $this->include('templates/footer'); ?>
 
 </body>
 <script type="text/javascript">
-    var baseUrl = '<?= base_url() ?>';
-    var site_url = '<?= site_url() ?>'
+    var baseUrl = '<?= base_url() ?>'; //URL base del proyecto
+    var site_url = '<?= site_url() ?>'; 
+    var datosHistorial = <?= json_encode($casosFinalizados ?? []); ?>; //Primero van los url y luego los datos
 </script>
 <!-- jQuery primero, después Popper.js, luego Bootstrap JS -->
 <script src="<?= base_url('assets/js/jquery.min.js'); ?>"></script>
@@ -312,6 +332,6 @@
 <script src="<?= base_url('assets/js/moment/moment-2.30.1.js'); ?>"></script>
 
 <script src="<?= base_url('assets/js/tablas/botonDesplegar.js') ?>"></script>
-<script src="<?= base_url('assets/js/tablas/listarCasosFinalizados.js'); ?>"></script>
+<script src="<?= base_url('assets/js/tablas/listarHistorial.js'); ?>"></script>
 
 </html>
