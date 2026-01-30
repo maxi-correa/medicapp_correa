@@ -89,16 +89,23 @@
             <div style="text-align: left;">
                 <b>Legajo:</b> <?php echo $legajo ?><br>
                 <b>Empleado/a:</b> <?php echo $nombre . " " . $apellido ?><br>
+                <?php if (!empty($casosPendientes) or !empty($casosActivos)): ?>
+                    <p>Existe un caso <b>en curso</b>. <button class='verde btn-accion btn-redirigir' onclick="location.href='<?= base_url('visualizarCasoE') ?>'">Ir al caso</button> </p>
+                    <?php else: ?>
+                        <p>No existen casos en curso.</p>
+                <?php endif; ?>
             </div>
             <div style="text-align: right;">
                 <button class='rojo' onclick="location.href='<?= base_url('perfil') ?>'">Atrás</button>
             </div>
         </div>
 
-        <!-- TABLA DE CASOS PENDIENTES !-->
+        <!-- TABLA DE CASOS PENDIENTES (NO EXISTIRÁ POR SUGERENCIA DE CORRECCIÓN)!-->
+        <!-- 
+                    
         <div class="container">
             <div class="encabezado-azul raleway d-flex justify-content-center align-items-center fw-bold texto-blanco">
-                CASOS PENDIENTES
+                CASO PENDIENTE
             </div>
             <div class="table-responsive-md">
 
@@ -109,11 +116,10 @@
                             <th>CORRESPONDE A</th>
                             <th>FECHA INICIADO</th>
                             <th>DISPONE DE CERTIFICADO</th>
-                            <?php if (!empty(array_filter($casosPendientes, fn($caso) => $caso['idCertificado'] !== null))): ?>
-
+                            <?php //if (!empty(array_filter($casosPendientes, fn($caso) => $caso['idCertificado'] !== null))): ?>
                                 <th>SEVERIDAD</th>
                                 <th>CERTIFICADO</th>
-                            <?php endif; ?>
+                            <?php //endif; ?>
                             <th>VER CASO</th>
                             <th>
                                 <button class="toggle-tbody btn" onclick="desplegar('tableBodyPendientes');">
@@ -132,12 +138,20 @@
                                     <td><?= $caso['tipoCertificado']; ?></td>
                                     <td><?= DateTime::createFromFormat("Y-m-d", $caso['fechaAusencia'])->format("d/m/Y"); ?></td>
                                     <td><?= $caso['disponeCertificado']; ?></td>
-                                    <td><?= $caso['tiposeveridad']; ?></td>
-                                    <?php if ($caso['idCertificado'] != null): ?>
-                                        <td>
+                                    <td>
+                                        <?php if ($caso['tiposeveridad'] !== null): ?>
+                                            <?= $caso['tiposeveridad']; ?>
+                                        <?php else: ?>
+                                            ---
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($caso['idCertificado'] != null): ?>
                                             <a id='btn-descargar-certificado' class='bg-transparent' href="<?php echo base_url('download/' . $caso['legajo'] . '/' . $caso['idCertificado']) ?>"> <img class='img_asignar_estado' src="<?php echo base_url('assets/img/icono_descargar_certificado.png') ?>"> </a>
-                                        </td>
-                                    <?php endif; ?>
+                                        <?php else: ?>
+                                            ---
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <button class='verde btn-accion btn-redirigir' onclick="location.href='<?= base_url('visualizarCasoE') ?>'">Ver</button>
                                     </td>
@@ -146,18 +160,18 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7">No hay casos pendientes</td>
+                                <td colspan="8">No hay casos pendientes</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
-
-            </div> <!-- FIN Tabla responsiva !-->
-        </div>
-        <!-- TABLA DE CASOS ACTIVOS !-->
+            </div>
+            </div> FIN Tabla responsiva !-->
+        <!-- TABLA DE CASOS ACTIVOS (NO EXISTIRÁ POR SUGERENCIA DE CORRECIÓN)!-->
+        <!--
         <div class="container">
             <div class="encabezado-azul raleway d-flex justify-content-center align-items-center fw-bold texto-blanco">
-                CASOS ACTIVOS
+                CASO ACTIVO
             </div>
             <div class="table-responsive-md">
 
@@ -202,14 +216,14 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7">No hay casos activos</td>
+                                <td colspan="8">No hay casos activos</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
 
-            </div> <!-- FIN Tabla responsiva !-->
-        </div>
+            </div>
+            </div> FIN Tabla responsiva !-->
 
         <!-- TABLA DE CASOS FINALIZADOS !-->
         <div class="container">
@@ -269,7 +283,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6">No hay casos finalizados</td>
+                                <td colspan="10">No hay casos finalizados</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -298,7 +312,6 @@
 <script src="<?= base_url('assets/js/moment/moment-2.30.1.js'); ?>"></script>
 
 <script src="<?= base_url('assets/js/tablas/botonDesplegar.js') ?>"></script>
-<script src="<?= base_url('assets/js/tablas/listarCertificadosEmpleado.js'); ?>"></script>
-<script src="<?= base_url('assets/js/tablas/listarSeguimientos.js'); ?>"></script>
+<script src="<?= base_url('assets/js/tablas/listarCasosFinalizados.js'); ?>"></script>
 
 </html>
