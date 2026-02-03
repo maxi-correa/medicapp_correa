@@ -111,6 +111,14 @@
 
     <!--###################################################################################################################################-->
     <main class="content">
+        <!-- Encabezado -->
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between encabezado ">
+                <button class='rojo' onclick="location.href='<?= base_url('medicos')?>'">Atrás</button>
+                <div class="encabezado-blanco text-center texto-negro raleway fw-bold display-6 flex-grow-1">HABILITAR/DESHABILITAR MÉDICO</div>
+            </div>
+        </div>
+
         <div class="container-grid">
             <!-- Primer cuadrante: Detalles del Médico -->
             <div class="grid-item">
@@ -219,21 +227,18 @@
                     -->
                     <div>
                         <div style="text-align: center;">
-                            <label for="">CONFIRMAR DESHABILITACIÓN: </label>
+                            <label for="">Confirmar Deshabilitación: </label>
                         </div>
                         <div>
-                            <a class="rojo me-1" href="javascript:void(0);" id="btna" data-matricula="<?= $medico['matricula'] ?>" data-url="<?= base_url('medicos/deshabilitarMedico') ?>/<?= $medico['matricula'] ?>">DESHABILITAR PERMANENTEMENTE</a>
-                            <a class="rojo me-1" href="javascript:void(0);" id="btnt">DESHABILITAR TEMPORALMENTE</a>
-                            <button class='rojo me-1' onclick="location.href='<?= base_url('medicos'); ?>'">VOLVER ATRAS</button>
+                            <a class="rojo me-1" href="javascript:void(0);" id="btna" data-matricula="<?= $medico['matricula'] ?>" data-url="<?= base_url('medicos/deshabilitarMedico') ?>/<?= $medico['matricula'] ?>">Deshabilitar permanentemente</a>
+                            <a class="rojo me-1" href="javascript:void(0);" id="btnt">Deshabilitar temporalmente</a>
                         </div>
                     </div>
                 </div>
 
                 <div id="deshabilitarContenedor" class="deshabilitarContenedor">
-
                     <label for="">Confirmar habilitación: </label>
                     <a class="verde me-1" href="#" id="btnHabilitar" data-matricula="<?= $medico['matricula'] ?>" data-url="<?= base_url('medicos/habilitarMedico') ?>/<?= $medico['matricula'] ?>">Habilitar</a>
-                    <button class='rojo me-1' onclick="location.href='<?= base_url('medicos'); ?>'">Cancelar</button>
                 </div>
             </div>
 

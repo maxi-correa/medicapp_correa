@@ -56,6 +56,9 @@
     <!--###################################################################################################################################-->
     <main class="content ">
     <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8 text-start mb-3">
+            <button class='rojo' onclick="location.href='<?= base_url('/turnos/listar')?>'">Atrás</button>
+        </div>
             <div class="col-12 col-md-10 col-lg-8 mb-2 azul text-center rounded-top">
                 <div class="texto-blanco relaway text-uppercase font-weight-bold" style="font-size: 28px;">Reportes</div>
             </div>

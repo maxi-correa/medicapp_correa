@@ -61,20 +61,24 @@
 
     <!--###################################################################################################################################-->
     <main class="content">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8 azul text-center">
-                <div class="texto-blanco font-weight-bold relaway text-uppercase" style="font-size: 28px;">Medicos Auditores</div>
-            </div>
+                
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-10 col-lg-8 text-start mb-3">
+                        <button class='rojo' onclick="location.href='<?= base_url('/turnos/listar')?>'">Atrás</button>
+                    </div>
+                    <div class="col-12 col-md-10 col-lg-8 azul text-center">
+                    <div class="texto-blanco font-weight-bold relaway text-uppercase" style="font-size: 28px;">Medicos Auditores</div>
+                </div>
 
-            <div class="col-12 col-md-10 col-lg-8">
-                <div class="tabla-contenedor mt-0 mb-0">
-                    <?php if (!empty($medicos)): ?>
-                        <div class="text-end gris d-flex align-items-center" style="height: 3em;">
-                            <div class="ms-auto pr-4">
-                                <a class="verde" href="<?= base_url('medicos/crear') ?>" style="height: 45px;
-    width: 50px;"><img src="<?= base_url('assets/img/agregar_medico.png') ?>" alt="agregar medico" style="width: 35px;">Crear</a>
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="tabla-contenedor mt-0 mb-0">
+                        <?php if (!empty($medicos)): ?>
+                            <div class="text-end gris d-flex align-items-center" style="height: 3em;">
+                                <div class="ms-auto pr-4">
+                                    <a class="verde" href="<?= base_url('medicos/crear') ?>" style="height: 45px;
+                                    width: 50px;"><img src="<?= base_url('assets/img/agregar_medico.png') ?>" alt="agregar medico" style="width: 35px;">Crear</a>
+                                </div>
                             </div>
-                        </div>
                         <table id="tableListarMedicosAuditores" class="table table-hover">
                             <thead class="celeste texto-negro text-uppercase font-weight-bold relaway">
                                 <tr>
@@ -132,11 +136,6 @@
     <script src="<?= base_url('assets/js/dataTable/dataTable-2.1.8.js'); ?>"></script>
 
     <script src="<?= base_url('assets/js/paginadoListar/paginadoListarMedicos.js'); ?>"></script>
-
-    <script>
-
-    </script>
-
 
 </body>
 

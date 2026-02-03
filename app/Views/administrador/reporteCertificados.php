@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="/medicapp_correa/public/assets/css/variables.css">
   <link rel="stylesheet" href="/medicapp_correa/public/assets/css/layout.css">
   <link rel="stylesheet" href="/medicapp_correa/public/assets/css/navbar.css">
-  <!-- <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css"> -->
+  <link rel="stylesheet" href="/medicapp_correa/public/assets/css/buttons.css">
   <link rel="stylesheet" href="/medicapp_correa/public/assets/css/colores.css">
   <link rel="stylesheet" href="<?= base_url('assets/css/texto.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/dataTable.css'); ?>">
@@ -66,6 +66,9 @@
   <main>
     <div class="container">
       <div>
+            <div class="col-12 col-md-10 col-lg-8 text-start mb-3">
+            <button class='rojo' onclick="location.href='<?= base_url('/reportes')?>'">Atrás</button>
+            </div>
         <div class="azul texto-blanco font-weight-bold relaway" style="font-size: 28px;">
           <div class="w-100 ml-3">REPORTE DE CERTIFICADOS EMITIDOS POR MEDICOS TRATANTES</div>
         </div>

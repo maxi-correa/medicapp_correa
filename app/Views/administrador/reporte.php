@@ -130,6 +130,9 @@
     <!--###################################################################################################################################-->
     <main class="content">
         <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 text-start mb-3">
+            <button class='rojo' onclick="location.href='<?= base_url('/reportes')?>'">Atrás</button>
+            </div>
             <div class="col-12 col-md-10 col-lg-8 mb-2 text-center rounded-top azul">
                 <div class="texto-blanco  text-uppercase relaway font-weight-bold" style="font-size: 28px;">Reporte de Médicos Tratantes</div>
             </div>

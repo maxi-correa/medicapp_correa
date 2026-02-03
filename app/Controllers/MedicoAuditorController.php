@@ -86,9 +86,66 @@ class MedicoAuditorController extends BaseController
             'horaFin'     => $datos['horaFin'],
             'duracion'    => $datos['duracion'],
         ];
+
+        //Verificar que ningún horario se solape
+        $horariosExistentes = $this->horarioModel
+            ->where('matricula', $matricula)
+            ->where('diaSemana', $dia)
+            ->findAll();
+
+        foreach ($horariosExistentes as $horarioExistente) {
+            if (
+                $horario['horaInicio'] < $horarioExistente['horaFin'] &&
+                $horario['horaFin'] > $horarioExistente['horaInicio']
+            ) {
+                return redirect()->to('medicos/informacion/' . $matricula . '/' . urlencode($dia))
+                    ->with('error', 'El horario se solapa con otro horario existente.');
+            }
+        }
+        // Insertar el nuevo horario
         $this->horarioModel->insert($horario);
+        
+        // Redirigir a la vista de información del médico
         return redirect()->to('medicos/informacion/' . $matricula . '/' . urlencode($dia));
     }
+
+    public function eliminarHorario()
+    {
+        $idHorario = $this->request->getPost('idHorario');
+        $matricula = $this->request->getPost('matricula');
+        $dia = $this->request->getPost('dia');
+
+        if (!$idHorario || !$matricula || !$dia) {
+            return redirect()->back()
+                ->with('error', 'Datos incompletos.');
+        }
+
+        // Verificar que exista el horario y eliminarlo
+        $horario = $this->horarioModel
+            ->where('idHorario', $idHorario)
+            ->where('matricula', $matricula)
+            ->delete();
+
+        if (!$horario) {
+            return redirect()->back()
+                ->with('error', 'El horario no existe.');
+        }
+
+        //Verificar que para ese día existan otros horarios
+        $otrosHorarios = $this->horarioModel
+            ->where('matricula', $matricula)
+            ->where('diaSemana', $dia)
+            ->findAll();
+
+        if (empty($otrosHorarios)) {
+            // Si no hay más horarios para ese día, redirigir a la vista anterior
+            return redirect()->to('medicos/informacion/' . $matricula);
+        } else {
+            // Si hay otros horarios, redirigir al día específico
+            return redirect()->to('medicos/informacion/' . $matricula . '/' . urlencode($dia));
+        }
+    }
+
 
     public function obtenerMedicos()
     {

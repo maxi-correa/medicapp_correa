@@ -58,6 +58,7 @@ $routes->group('', ['filter' => 'AdministradorFilter'], function ($routes) {
     $routes->post('/medicos/deshabilitarMedico/(:any)', 'MedicoAuditorController::deshabilitarMedico/$1');
     $routes->get('/medicos/deshabilitarMedico/(:any)', 'MedicoAuditorController::deshabilitarMedico/$1');
     $routes->post('/medicos/deshabilitarMedicoTemporal', 'MedicoAuditorController::deshabilitarMedicoTemporalmente');
+    $routes->post('/medicos/horarios/eliminar', 'MedicoAuditorController::eliminarHorario');
     //$routes->post('/medicos/deshabilitar/(:any)', 'MedicoAuditorController::mostrarInformacion/$1');
     #.................................................asignar estado 
     $routes->get('/certificado/(:any)/(:any)', 'CertificadoController::verImagen/$1/$2');
