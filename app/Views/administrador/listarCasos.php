@@ -1,5 +1,5 @@
 
-<?= $this->include('templates/menu'); ?>
+<?= $this->include('templates/menuAdministrador'); ?>
 
     <div class="container">
         <div class="relaway text-center"><h1>LISTA DE CASOS</h1></div>

@@ -67,7 +67,7 @@ class CasoModel extends Model
 
     public function obtenerUnCaso($nroTramite)
     {
-        $sql = $this->db->query("SELECT DISTINCT c.numeroTramite, c.legajo, c.corresponde as tipoCertificado, CONCAT(em.nombre, ' ' ,em.apellido) as empleado, c.fechaInicio as fechaAusencia, c.fechaFin, c.lugarReposo,
+        $sql = $this->db->query("SELECT DISTINCT c.numeroTramite, c.legajo, c.corresponde as tipoCertificado, CONCAT(em.nombre, ' ' ,em.apellido) as empleado, c.fechaInicio as fechaAusencia, c.fechaFin, cr.lugarReposo, 
         c.motivo, tc.tiposeveridad, CONCAT(fr.nombre, ' ', fr.apellido) as pacienteFamiliar, 
         CASE WHEN c.corresponde = 'Familiar' THEN fr.dni ELSE em.dni END AS dniPaciente 
         FROM `casos` c INNER JOIN empleados_rrhh em on c.legajo= em.legajo 
