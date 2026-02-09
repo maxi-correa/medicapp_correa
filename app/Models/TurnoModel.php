@@ -39,10 +39,11 @@ class TurnoModel extends Model
                                 CONCAT (t.hora) as hora,
                                 CONCAT (erh.nombre,' ',erh.apellido) as paciente,
                                 CONCAT (ma.nombre,' ',ma.apellido) as medico, 
-                                (ca.lugarReposo) as direccion, e.estado,
+                                (cr.lugarReposo) as direccion, e.estado,
                                 t.numeroTramite
                                 FROM `turnos` as t
                                 LEFT JOIN casos as ca on t.numeroTramite = ca.numeroTramite
+                                LEFT JOIN certificados as cr on ca.numeroTramite = cr.numeroTramite
                                 LEFT JOIN empleados_rrhh as erh on ca.legajo = erh.legajo
                                 LEFT JOIN medicos_auditores as ma on t.matricula = ma.matricula
                                 INNER JOIN estados as e on e.idEstado = t.idEstado
@@ -63,11 +64,12 @@ class TurnoModel extends Model
                                 CONCAT (t.hora) as hora,
                                 CONCAT (erh.nombre,' ',erh.apellido) as paciente,
                                 CONCAT (ma.nombre,' ',ma.apellido) as medico, 
-                                (ca.lugarReposo) as direccion,
+                                (cr.lugarReposo) as direccion,
                                 t.motivo,
                                 t.numeroTramite
                                 FROM `turnos` as t
                                 LEFT JOIN casos as ca on t.numeroTramite = ca.numeroTramite
+                                LEFT JOIN certificados as cr on ca.numeroTramite = cr.numeroTramite
                                 LEFT JOIN empleados_rrhh as erh on ca.legajo = erh.legajo
                                 LEFT JOIN medicos_auditores as ma on t.matricula = ma.matricula
                                 WHERE t.fecha = ? AND t.matricula = ?   AND t.idEstado = 10", [$fecha, $matricula]);
@@ -83,9 +85,10 @@ class TurnoModel extends Model
                                 CONCAT (t.hora) as hora,
                                 CONCAT (erh.nombre,' ',erh.apellido) as paciente,
                                 CONCAT (ma.nombre,' ',ma.apellido) as medico, 
-                                (ca.lugarReposo) as direccion
+                                (cr.lugarReposo) as direccion
                                 FROM `turnos` as t
                                 LEFT JOIN casos as ca on t.numeroTramite = ca.numeroTramite
+                                LEFT JOIN certificados as cr on ca.numeroTramite = cr.numeroTramite
                                 LEFT JOIN empleados_rrhh as erh on ca.legajo = erh.legajo
                                 LEFT JOIN medicos_auditores as ma on t.matricula = ma.matricula
                                 WHERE t.fecha >= ?

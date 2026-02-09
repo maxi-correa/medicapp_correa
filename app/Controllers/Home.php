@@ -91,7 +91,6 @@ class Home extends BaseController
                     'rol' => $empleado['rol'],
                     'menu' => $this->generateMenu($empleado['rol']),
                     'isLoggedIn' => true,
-
                 ]);
 
                 if ($casoActivo) {

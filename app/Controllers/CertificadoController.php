@@ -11,6 +11,7 @@ use App\Models\MedicoModel;
 use App\Models\MedicoTratanteModel;
 use App\Models\SeguimientoModel;
 use App\Models\TipoCategoriaModel;
+use App\Models\NotificacionModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Session\Session;
 use Config\Services;
@@ -28,6 +29,7 @@ class CertificadoController extends BaseController
     protected $certificadoModel;
     protected $empleadoCategoriaModel;
     protected $seguimientoModel;
+    protected $notificacionModel;
 
 
     public function __construct()
@@ -40,6 +42,7 @@ class CertificadoController extends BaseController
         $this->casoModel = new CasoModel();
         $this->certificadoModel = new CertificadoModel();
         $this->empleadoCategoriaModel = new EmpleadoCategoriaModel();
+        $this->notificacionModel = new NotificacionModel();
 
         Carbon::setLocale('es');
     }
@@ -119,6 +122,10 @@ class CertificadoController extends BaseController
                 // Obtiene el ID del último registro insertado
                 $nuevoID = $this->certificadoModel->insertID();
                 $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
+                
+                // Elimina la notificación de certificado pendiente
+                $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
+                
                 return redirect()->to('visualizarCasoE')->with('success', 'Certificado guardado correctamente.');
             }
         } else {
@@ -142,6 +149,10 @@ class CertificadoController extends BaseController
                     // Obtiene el ID del último registro insertado
                     $nuevoID = $this->certificadoModel->insertID();
                     $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
+                    
+                    // Elimina la notificación de certificado pendiente
+                    $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
+                    
                     return redirect()->to('menu-empleado')->with('error', 'Certificado INJUSTIFICADO por dias insuficientes. Caso FINALIZADO.');
                 }
             } else {
@@ -161,6 +172,10 @@ class CertificadoController extends BaseController
                     // Obtiene el ID del último registro insertado
                     $nuevoID = $this->certificadoModel->insertID();
                     $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
+                    
+                    // Elimina la notificación de certificado pendiente
+                    $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
+                    
                     return redirect()->to('visualizarCasoE')->with('error', 'Certificado INJUSTIFICADO por dias insuficientes.');
                 }
             }
@@ -171,7 +186,9 @@ class CertificadoController extends BaseController
     {
         $fecha = Carbon::parse($fechaEmision);
         $diasReposo = (int)$diasReposo;
-        return $diasReposo === 1 ? $fecha : $fecha->addDays($diasReposo)->format('Y-m-d');
+        
+        //Si es un día, devuelve la fecha de emisión, sino suma los días de reposo a la fecha de emisión
+        return $diasReposo === 1 ? $fecha : $fecha->addDays($diasReposo)->format('Y-m-d'); 
     }
 
 

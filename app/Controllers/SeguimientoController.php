@@ -32,7 +32,8 @@ class SeguimientoController extends BaseController
         $this->certificadoModel = new CertificadoModel();
         Carbon::setLocale('es');
     }
-
+    
+    // Función para mostrar la vista de seguimiento, con validaciones de turno y certificados
     public function index()
     {
         $valoresEnum = $this->seguimientoModel->obtenerValoresEnum($this->columna);
@@ -46,9 +47,9 @@ class SeguimientoController extends BaseController
         $fechaTurno = Carbon::parse($turno['fecha']);
         $horaTurno = Carbon::parse($turno['hora']);
     
-        $fechaHoraTurno = $fechaTurno->setTime($horaTurno->hour, $horaTurno->minute, $horaTurno->second)->subHours(6);
+        $fechaHoraTurno = $fechaTurno->setTime($horaTurno->hour, $horaTurno->minute, $horaTurno->second)->subHours(6); //6 horas antes del turno
         //$fechaHoraTurno = $fechaTurno->setTime($horaTurno->hour, $horaTurno->minute, $horaTurno->second);
-        $fechaFinTurno = $fechaHoraTurno->copy()->addHours(12   );
+        $fechaFinTurno = $fechaHoraTurno->copy()->addHours(12   ); //add 12 horas desde 6 horas antes del turno (es decir, 6 horas después del turno)
 
             if ($ahora->lessThan($fechaHoraTurno)) {
                 log_message('debug', 'Redirigiendo porque la hora actual es menor al inicio del turno');
@@ -114,7 +115,7 @@ class SeguimientoController extends BaseController
         $fechaEmision = Carbon::parse($certificado['fechaEmision']);
         $fechaOtorgada = Carbon::parse($certificado['diasOtorgados']);
         $diferenciaDias = abs($fechaEmision->diffInDays($fechaOtorgada, false));
-        $diferenciaDiasConIncluidos = $diferenciaDias + 1;
+        $diferenciaDiasConIncluidos = $diferenciaDias + 1; // Incluir el día de emisión
         $categoriaEmpleado = $this->categoriaEmpleadoModel->obtenerCategoriaDeCaso($caso['legajo'], $caso['tipoCategoriaVigente']);
         $diasDisponibles = $categoriaEmpleado['diasDisponibles'];
         $id = $categoriaEmpleado['id'];

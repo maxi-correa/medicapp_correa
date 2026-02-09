@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\NotificacionModel;
 
 /**
  * Class BaseController
@@ -56,6 +57,86 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
+
+        if (session()->has('rol')) {
+
+            $rol    = session('rol');
+            
+            $tieneNotificaciones = false;
+            
+            /* ============================
+            EMPLEADO COMÚN
+            ============================ */
+            if ($rol === 'Empleado Común') {
+                
+                $legajo = session('legajo');
+                $notificacionModel = new NotificacionModel();
+                $certificadoModel  = new \App\Models\CertificadoModel();
+
+                // 1️. Notificaciones guardadas en BD
+                $cantidadBD = $notificacionModel->contarPorUsuario($legajo, $rol);
+
+                // 2️. Certificados pendientes de revisión
+                $cantidadPendientesRevision = $certificadoModel
+                    ->join('casos', 'casos.numeroTramite = certificados.numeroTramite')
+                    ->where('casos.legajo', $legajo)
+                    ->where('certificados.idEstado', 6)
+                    ->countAllResults();
+
+                $tieneNotificaciones = ($cantidadBD + $cantidadPendientesRevision) > 0;
+            }
+
+            /* ============================
+            ADMINISTRADOR
+            ============================ */
+            elseif ($rol === 'Admin. Medicina Laboral') {
+
+                $certificadoModel = new \App\Models\CertificadoModel();
+                $casoModel        = new \App\Models\CasoModel();
+                $notificacionModel = new NotificacionModel();
+
+                // 1. Certificados pendientes de revisión
+                $cantidadCertificados = $certificadoModel->contarPendientesRevision();
+
+                // 2. Casos activos que requieren sugerir turno
+                $cantidadCasosSinTurno = $casoModel
+                ->where('idEstado', '2') //ACTIVOS
+                ->whereIn('tipoCategoriaVigente', ['2', '3']) //MODERADA O GRAVE
+                ->where('fechaSugeridaTurno IS NULL', null, false)
+                ->countAllResults();
+
+                // 3. Casos activos sin fecha de sugerencia de turno que están próximos a necesitar reprogramación
+                $CasosProximosReprogramacion = $notificacionModel->casosPendientesDeReprogramacion();
+                $cantidadCasosProximosReprogramacion = count($CasosProximosReprogramacion);
+
+
+                $tieneNotificaciones = ($cantidadCertificados + $cantidadCasosSinTurno + $cantidadCasosProximosReprogramacion) > 0;        
+            }
+            elseif ($rol === 'Medico') 
+            {
+                $matricula = session('matricula');
+                $notificacionModel = new NotificacionModel();
+
+                $turnos = $notificacionModel
+                    ->turnosParaNotificacionesPorMedico($matricula);
+
+                // Hay notificación si al menos un turno cumple alguna condición
+                $tieneNotificaciones = false;
+
+                foreach ($turnos as $turno) {
+                    if (
+                        $turno['seguimientoHabilitado'] ||
+                        $turno['esRecordatorioPrevioHoy'] ||
+                        $turno['esTurnoFuturo']
+                    ) {
+                        $tieneNotificaciones = true;
+                        break;
+                    }
+                }
+            }
+
+        session()->set('tieneNotificaciones', $tieneNotificaciones);
+        }
     }
 
     public function encriptar($msg){

@@ -25,9 +25,16 @@
             <li class="nav-item">
                 <span class="nav-link"><?php echo session('rol'); ?></span>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
+            <li class="nav-item position-relative me-3">
+                <a class="nav-link <?= session('tieneNotificaciones') ? '' : 'disabled' ?>" href="<?= session('tieneNotificaciones') ? base_url('notificaciones') : '#' ?>">
                     <i class="fas fa-bell"></i>
+                    
+                    <?php if (session('tieneNotificaciones')): ?>
+                    <span
+                        class="position-absolute bg-danger rounded-circle"
+                        style="width:8px; height:8px;">
+                    </span>
+                    <?php endif; ?>
                 </a>
             </li>
             <li class="nav-item">

@@ -80,4 +80,10 @@ class CertificadoModel extends Model
     {
         return $this->where('matricula', $matricula)->countAllResults();
     }
+
+    // Función creada para NOTIFICACIONES de Administrador
+    public function contarPendientesRevision()
+    {
+        return $this->where('idEstado', 6)->countAllResults();
+    }
 }

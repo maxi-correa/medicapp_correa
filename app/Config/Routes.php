@@ -25,6 +25,7 @@ $routes->get('medicos/informacion/(:segment)/(:any)/vacio','MedicoAuditorControl
 $routes->get('medicos/informacion/(:segment)/(:any)','MedicoAuditorController::mostrarInformacionDia/$1/$2');
 $routes->get('medicos/informacion/(:segment)','MedicoAuditorController::mostrarInformacion/$1');
 $routes->post('medicos/informacion/(:segment)/(:segment)/guardar', 'MedicoAuditorController::guardarHorario/$1/$2');
+$routes->get('notificaciones', 'NotificacionController::listar');
 
 
 // =====================================================
