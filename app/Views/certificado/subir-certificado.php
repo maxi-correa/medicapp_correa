@@ -36,6 +36,17 @@
     <!--###################################################################################################################################-->
     <main class="content">
         <div class="contenido-centrado">
+
+            <?php if (session()->getFlashdata('error')): ?>
+                <div class="alert alert-danger">
+                    <ul>
+                        <?php foreach (session()->getFlashdata('error') as $error): ?>
+                            <li><?= esc($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
             <div class="form-container" style="border: none;">
                 <h4 class="card-title texto-blanco azul borde mb-2">Subir Certificado</h4>
                 
@@ -265,15 +276,16 @@
             }
 
             const certificado = document.getElementById("certificado");
-            const maxSize = 5 * 1024 * 1024;
-            const validExtensions = ["image/jpg", "image/png"]; // Tipos MIME permitidos
+            const maxSize = 5 * 1024 * 1024; // 5 MB en bytes
+            const validExtensions = ["jpg", "jpeg", "png"]; // Tipos MIME permitidos. MIME significa Multipurpose Internet Mail Extensions, es un estándar que indica la naturaleza y formato de un documento, archivo o conjunto de bytes. En este caso, se utilizan para validar el tipo de archivo subido.
+            const fileName = certificado.files[0].name.split('.').pop().toLowerCase(); // Obtener la extensión del archivo
 
             if (certificado.value.trim() === "") {
                 const errorElement = document.getElementById("error-certificado");
                 errorElement.textContent = "Por favor, selecciona un archivo.";
                 errorElement.classList.add('show');
                 valid = false;
-            } else if (!validExtensions.includes(certificado.files[0].type)) {
+            } else if (!validExtensions.includes(fileName)) {
                 const errorElement = document.getElementById("error-certificado");
                 errorElement.textContent = "Solo se permiten archivos JPG y PNG.";
                 errorElement.classList.add('show');

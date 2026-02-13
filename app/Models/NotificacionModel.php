@@ -44,6 +44,107 @@ class NotificacionModel extends Model
                 ->countAllResults();
     }
 
+    /*=================
+    EMPLEADO
+    =================*/
+    
+    public function certificadosPendientesDeCarga(string $legajo): array
+    {
+        return $this->db->table('casos c')
+            ->select('
+                c.numeroTramite,
+                c.fechaFin,
+                e.nombre,
+                e.apellido
+            ')
+            ->join('empleados_rrhh e', 'e.legajo = c.legajo')
+            ->join('certificados cert', 'cert.numeroTramite = c.numeroTramite', 'left')
+            ->where('c.legajo', $legajo)
+            ->where('c.idEstado', 1) // PENDIENTE
+            ->where('cert.idCertificado IS NULL')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function certificadosEnRevision(string $legajo): array
+    {
+        return $this->db->table('certificados cert')
+            ->select('
+                cert.numeroTramite,
+                cert.fechaEmision,
+                e.nombre,
+                e.apellido
+            ')
+            ->join('casos c', 'c.numeroTramite = cert.numeroTramite')
+            ->join('empleados_rrhh e', 'e.legajo = c.legajo')
+            ->where('c.legajo', $legajo)
+            ->where('cert.idEstado', 6) // PENDIENTE DE REVISION
+            ->get()
+            ->getResultArray();
+    }
+
+    //Función de empleado especifica para BaseController
+    public function contarNotificacionesEmpleado(string $legajo): int
+    {
+        // 1️. Certificados pendientes de carga
+        $pendientes = $this->db->table('casos c')
+            ->join('certificados cert', 'cert.numeroTramite = c.numeroTramite', 'left')
+            ->where('c.legajo', $legajo)
+            ->where('c.idEstado', 1)
+            ->where('cert.idCertificado IS NULL')
+            ->countAllResults();
+
+        // 2️. Certificados en revisión
+        $enRevision = $this->db->table('certificados cert')
+            ->join('casos c', 'c.numeroTramite = cert.numeroTramite')
+            ->where('c.legajo', $legajo)
+            ->where('cert.idEstado', 6)
+            ->countAllResults();
+
+        return $pendientes + $enRevision;
+    }
+
+    /*=================
+    AMINISTRADOR
+    =================*/
+
+    public function certificadosPendientesRevisionAdmin(): array
+    {
+        return $this->db->table('certificados cert')
+            ->select('
+                cert.idCertificado,
+                cert.numeroTramite,
+                cert.fechaEmision,
+                e.nombre,
+                e.apellido,
+                e.legajo
+            ')
+            ->join('casos c', 'c.numeroTramite = cert.numeroTramite')
+            ->join('empleados_rrhh e', 'e.legajo = c.legajo')
+            ->where('cert.idEstado', 6)
+            ->get()
+            ->getResultArray();
+    }
+
+    public function casosActivosSinTurno(): array
+    {
+        return $this->db->table('casos c')
+            ->select('
+                c.numeroTramite,
+                c.fechaInicio,
+                e.nombre,
+                e.apellido,
+                e.legajo
+            ')
+            ->join('empleados_rrhh e', 'e.legajo = c.legajo')
+            ->join('turnos t', 't.numeroTramite = c.numeroTramite', 'left')
+            ->where('c.idEstado', 2) // ACTIVO
+            ->whereIn('c.tipoCategoriaVigente', [2, 3]) // MODERADA o GRAVE
+            ->where('t.idTurno IS NULL', null, false) // sin turnos asociados
+            ->get()
+            ->getResultArray();
+    }
+
     public function resolverCertificadoPendiente($legajo, $numeroTramite)
     {
         return $this->where('tipo', 'CERTIFICADO_PENDIENTE')
@@ -103,7 +204,7 @@ class NotificacionModel extends Model
         return $builder->get()->getResultArray();
     }
 
-    // Función para MÉDICO: obtener turnos pendientes de atención (sin seguimiento registrado) próximos a su fecha
+
     public function turnosPendientesDeAtencionPorMedico(string $matricula): array
     {
         $hoy = Carbon::now()->toDateString();
@@ -134,7 +235,7 @@ class NotificacionModel extends Model
             'left'
         );
 
-        $builder->where('s.idTurno IS NULL', null, false); // sin seguimientos registrados
+        $builder->where('s.idTurno IS NULL', null, false); // sin turnos registrados
 
         return $builder->get()->getResultArray();
     }
@@ -189,7 +290,10 @@ class NotificacionModel extends Model
         });
     }
 
-    // Función para Médico: obtener casos activos con próximo turno hoy, para poder darles un turno
+    /*=================
+    MÉDICO AUDITOR
+    =================*/
+
     public function turnosParaNotificacionesPorMedico(string $matricula): array
     {
         $ahora = Carbon::now();
@@ -216,12 +320,9 @@ class NotificacionModel extends Model
         // Hoy en adelante
         $builder->where('t.fecha >=', $ahora->toDateString());
 
-        // Excluir turnos cerrados
-        $builder->whereNotIn('t.idTurno', function ($sub) {
-            $sub->select('idTurno')
-                ->from('seguimientos')
-                ->whereIn('tipoSeguimiento', ['ALTA', 'IRREGULAR']);
-        });
+        // Excluir turnos que ya tengan seguimiento
+        $builder->join('seguimientos s', 's.idTurno = t.idTurno', 'left');
+        $builder->where('s.idTurno IS NULL');
 
         $turnos = $builder->get()->getResultArray();
 

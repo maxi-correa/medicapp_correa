@@ -193,16 +193,8 @@ class CasoController extends BaseController
 
             if ($fechaFin <= $fechaActual) {
                 
-                // 1. Cierra el caso y lo pasa a finalizado
+                // Cierra el caso y lo pasa a finalizado
                 $this->casoModel->update($caso['numeroTramite'], ['idEstado' => '3']); //FINALIZADOS
-
-                // 2. Da como resuelta la notificación de certificado pendiente si existe
-                $this->notificacionModel
-                    ->where('tipo', 'CERTIFICADO_PENDIENTE')
-                    ->where('numeroTramite', $caso['numeroTramite'])
-                    ->where('estado', 'PENDIENTE')
-                    ->set('estado', 'RESUELTA')
-                    ->update();
             }
         }
     }
@@ -255,30 +247,6 @@ class CasoController extends BaseController
         
         $numeroTramite = $this->casoModel->insertID();
         $session->set('numeroTramite', $numeroTramite);
-        
-        try{ // Usamos try catch para manejar cualquier error que pueda surgir al crear la notificación
-            // Comprobamos que no existe la notificación antes de crearla
-            $existeNotificacion = $this->notificacionModel->where('legajo', $legajo)
-                ->where('rolDestino', 'Empleado Común')
-                ->where('numeroTramite', $numeroTramite)
-                ->where('tipo', 'CERTIFICADO_PENDIENTE')
-                ->first();
-
-            // Crear notificación para el empleado que aún no cargo el certificado
-            if (!$existeNotificacion) {
-                $this->notificacionModel->insert([
-                    'tipo'          => 'CERTIFICADO_PENDIENTE',
-                    'rolDestino'    => 'Empleado Común',
-                    'legajo'        => $legajo,
-                    'numeroTramite' => $numeroTramite,
-                    'fechaEvento'   => date('Y-m-d H:i:s'),
-                    'estado'        => 'PENDIENTE',
-                ]);
-            }
-        } catch (\Throwable $e) {
-            log_message('error', 'Error al crear notificación: ' . $e->getMessage());
-        }
-    
         
         if ($caso) {
             return $this->response->setJSON([

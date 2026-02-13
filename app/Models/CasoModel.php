@@ -215,6 +215,17 @@ class CasoModel extends Model
         return $sql->getResultArray();
     }
 
+    //########## FUNCIÓN PARA NOTIFICACIÓN DE ADMIN #########################################
+    public function contarCasosSinTurnoSugerido(): int
+    {
+        return $this
+            ->where('idEstado', 2) // Activos
+            ->whereIn('tipoCategoriaVigente', [2, 3]) // Moderada o Grave
+            ->where('fechaSugeridaTurno IS NULL', null, false)
+            ->countAllResults();
+    }
+
+
     //TODO PRUEBA DE URL OCULTA
     public function getCasos()
     {

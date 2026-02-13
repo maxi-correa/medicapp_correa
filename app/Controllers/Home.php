@@ -58,6 +58,7 @@ class Home extends BaseController
                 break;
             case 'Medico':
                 $menu[] = ['label' => 'Inicio', 'url' => base_url('turnos/listar')];
+                $menu[] = ['label' => 'Mis Horarios', 'url' => base_url('misHorarios')];
                 $menu[] = ['label' => 'Notificar Ausencia', 'url' => base_url('construccion')];
                 break;
         }

@@ -74,6 +74,26 @@ class CertificadoController extends BaseController
         $direccionReposo = $this->request->getPost('direccion');
         $archivoCertificado = $this->request->getFile('certificado');
 
+        // ================= VALIDACIÓN BACKEND ARCHIVO =================
+        $validationRule = [
+            'certificado' => [
+                'label' => 'Certificado',
+                'rules' => [
+                    'uploaded[certificado]',
+                    'max_size[certificado,5120]', // 5MB
+                    'mime_in[certificado,image/jpg,image/jpeg,image/png]',
+                    'ext_in[certificado,jpg,jpeg,png]',
+                ],
+            ],
+        ];
+
+        if (!$this->validate($validationRule)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', $this->validator->getErrors());
+        }
+        // ==============================================================
+
         if (!$this->medicoTratanteModel->find($matriculaMedico)) {
             $medico = $this->medicoSisaModel->find($matriculaMedico);
             $data =
@@ -87,12 +107,6 @@ class CertificadoController extends BaseController
         $session = session();
         $legajo = $session->get('legajo');
         $ruta = WRITEPATH . 'certificados/' . $legajo;
-
-        // Si la carpeta con el legajo del empleado no existe la crea
-        if (!is_dir($ruta)) { //is_dir — Devuelve true si el nombre del archivo existe y es un directorio
-            mkdir($ruta, 0777, false); // 0777 significa permisos de lectura, escritura y ejecución para todos. False significa que no se crearán carpetas padre automáticamente.
-        }
-
 
         $enfermedad = $this->enfermedadModel->find($codEnfermedad);
         $empleadoCategoria = $this->empleadoCategoriaModel->obtenerEmpleadoCategoria($legajo, $enfermedad['idCategoria']);
@@ -123,9 +137,6 @@ class CertificadoController extends BaseController
                 $nuevoID = $this->certificadoModel->insertID();
                 $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
                 
-                // Elimina la notificación de certificado pendiente
-                $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
-                
                 return redirect()->to('visualizarCasoE')->with('success', 'Certificado guardado correctamente.');
             }
         } else {
@@ -150,9 +161,6 @@ class CertificadoController extends BaseController
                     $nuevoID = $this->certificadoModel->insertID();
                     $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
                     
-                    // Elimina la notificación de certificado pendiente
-                    $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
-                    
                     return redirect()->to('menu-empleado')->with('error', 'Certificado INJUSTIFICADO por dias insuficientes. Caso FINALIZADO.');
                 }
             } else {
@@ -172,9 +180,6 @@ class CertificadoController extends BaseController
                     // Obtiene el ID del último registro insertado
                     $nuevoID = $this->certificadoModel->insertID();
                     $this->guardarImagen($ruta, $nuevoID, $archivoCertificado);
-                    
-                    // Elimina la notificación de certificado pendiente
-                    $this->notificacionModel->resolverCertificadoPendiente($legajo, $numeroTramiteDeCasoActual);
                     
                     return redirect()->to('visualizarCasoE')->with('error', 'Certificado INJUSTIFICADO por dias insuficientes.');
                 }
@@ -257,8 +262,25 @@ class CertificadoController extends BaseController
 
     public function guardarImagen($ruta, $nuevoID, $archivoCertificado)
     {
-        $nuevoNombre = $nuevoID . '.' . $archivoCertificado->getExtension();
-        $archivoCertificado->move($ruta, $nuevoNombre);
+        if (!$archivoCertificado->isValid()) {
+            throw new \RuntimeException($archivoCertificado->getErrorString());
+        }
+
+        if ($archivoCertificado->hasMoved()) {
+            throw new \RuntimeException('El archivo ya fue movido.'); //Se puede ver RunTimeException en la carpeta Exceptions
+        }
+
+        if (!is_dir($ruta)) {
+            mkdir($ruta, 0777, true);
+        }
+
+        $extension = $archivoCertificado->getClientExtension();
+
+        $nuevoNombre = $nuevoID . '.' . $extension;
+
+        if (!$archivoCertificado->move($ruta, $nuevoNombre)) {
+            throw new \RuntimeException('No se pudo mover el archivo.');
+        }
     }
 
 

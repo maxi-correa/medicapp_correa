@@ -25,13 +25,18 @@ $routes->get('medicos/informacion/(:segment)/(:any)/vacio','MedicoAuditorControl
 $routes->get('medicos/informacion/(:segment)/(:any)','MedicoAuditorController::mostrarInformacionDia/$1/$2');
 $routes->get('medicos/informacion/(:segment)','MedicoAuditorController::mostrarInformacion/$1');
 $routes->post('medicos/informacion/(:segment)/(:segment)/guardar', 'MedicoAuditorController::guardarHorario/$1/$2');
-$routes->get('notificaciones', 'NotificacionController::listar');
+$routes->get('notificaciones', 'NotificacionController::listar', ['filter' => 'role:Admin. Medicina Laboral,Empleado Común,Medico']);
+#.................................................Listar Turnos
+$routes->get('/turnos/listar', 'TurnoController::listar', ['filter' => 'role:Admin. Medicina Laboral,Medico']);
+$routes->get('turnos/listar/(:num)', 'TurnoController::listar/$1', ['filter' => 'role:Admin. Medicina Laboral,Medico']);
+#.................................................Descargar certificado
+$routes->get('/download/(:any)/(:any)', 'CertificadoController::descargarCertificado/$1/$2');
 
 
 // =====================================================
 // ADMINISTRADOR
 // =====================================================
-$routes->group('', ['filter' => 'AdministradorFilter'], function ($routes) {
+$routes->group('', ['filter' => 'role:Admin. Medicina Laboral'], function ($routes) {
     
     $routes->get('guardarNumeroTramite/(:num)', 'CasoController::guardarNumeroTramite/$1');
     #INICIO 
@@ -67,6 +72,8 @@ $routes->group('', ['filter' => 'AdministradorFilter'], function ($routes) {
     #.................................................Generar reportes
     $routes->get('/reportes', 'ReporteController::reportes');
     $routes->get('/reportes/certificados-emitidos', 'ReporteController::reporteTorta');
+    #....................................................Notificaciones
+    #$routes->get('notificaciones', 'NotificacionController::listar');
 
     //REPORTE CERTIFICADOS
     $routes->get('reportes/certificados','ReporteController::reporteCertificados');
@@ -81,7 +88,7 @@ $routes->group('', ['filter' => 'AdministradorFilter'], function ($routes) {
 // =====================================================
 // EMPLEADO
 // =====================================================
-$routes->group('', ['filter' => 'EmpleadoFilter'], function ($routes) {
+$routes->group('', ['filter' => 'role:Empleado Común'], function ($routes) {
     $routes->get('/menu-empleado', 'EmpleadoController::empleado');
     #.................................................Perfil / historial 
     $routes->get('/perfil', 'EmpleadoController::perfil');
@@ -99,12 +106,14 @@ $routes->group('', ['filter' => 'EmpleadoFilter'], function ($routes) {
     $routes->get('/certificado/(:num)', 'CertificadoController::verImagen/$1');
     $routes->get('/buscarMedico/(:num)', 'CertificadoController::buscarMedico/$1');
     $routes->get('/verificardias/(:num)/(:num)', 'CertificadoController::verificarDias/$1/$2');
+    #....................................................Notificaciones
+    #$routes->get('notificaciones', 'NotificacionController::listar');
 });
 
 // =====================================================
 // MEDICO AUDITOR
 // =====================================================
-$routes->group('', ['filter' => 'MedicoFilter'], function ($routes) {
+$routes->group('', ['filter' => 'role:Medico'], function ($routes) {
     $routes->get('/menu-medico', 'MedicoAuditorController::index1');
 
     #.................................................visualizar caso 
@@ -115,20 +124,19 @@ $routes->group('', ['filter' => 'MedicoFilter'], function ($routes) {
     #.................................................Genera observacion
     $routes->get('/seguimiento', 'SeguimientoController::index');
     $routes->post('/seguimiento', 'SeguimientoController::validar');
+    #....................................................Notificaciones
+    #$routes->get('notificaciones', 'NotificacionController::listar');
 
 
     $routes->get('guardarIdTurno/(:num)', 'TurnoController::guardarIdTurno/$1');
+    
+    
+    #..................................Ver horarios medico auditor
+    $routes->get('misHorarios', 'MedicoAuditorController::obtenerHorariosMedico');
 });
 
 
 
-#.................................................Listar Turnos
-$routes->get('/turnos/listar', 'TurnoController::listar');
-$routes->get('turnos/listar/(:num)', 'TurnoController::listar/$1');
-$routes->get('/download/(:any)/(:any)', 'CertificadoController::descargarCertificado/$1/$2');
-
-#..................................Ver horarios medico auditor
-$routes->get('misHorarios', 'MedicoAuditorController::obtenerHorariosMedico');
 
 
 
