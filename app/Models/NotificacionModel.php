@@ -28,21 +28,6 @@ class NotificacionModel extends Model
     ];
 
     protected $useTimestamps = false;
-    
-    // Función solo de prueba
-    public function obtenerTodas()
-    {
-        return $this->findAll();
-    }
-    
-    // Función para contar notificaciones por usuario y rol, de prueba
-    public function contarPorUsuario($legajo, $rol)
-    {
-    return $this->where('estado', 'PENDIENTE')
-                ->where('legajo', $legajo)
-                ->where('rolDestino', $rol)
-                ->countAllResults();
-    }
 
     /*=================
     EMPLEADO
@@ -83,27 +68,6 @@ class NotificacionModel extends Model
             ->getResultArray();
     }
 
-    //Función de empleado especifica para BaseController
-    public function contarNotificacionesEmpleado(string $legajo): int
-    {
-        // 1️. Certificados pendientes de carga
-        $pendientes = $this->db->table('casos c')
-            ->join('certificados cert', 'cert.numeroTramite = c.numeroTramite', 'left')
-            ->where('c.legajo', $legajo)
-            ->where('c.idEstado', 1)
-            ->where('cert.idCertificado IS NULL')
-            ->countAllResults();
-
-        // 2️. Certificados en revisión
-        $enRevision = $this->db->table('certificados cert')
-            ->join('casos c', 'c.numeroTramite = cert.numeroTramite')
-            ->where('c.legajo', $legajo)
-            ->where('cert.idEstado', 6)
-            ->countAllResults();
-
-        return $pendientes + $enRevision;
-    }
-
     /*=================
     AMINISTRADOR
     =================*/
@@ -129,20 +93,24 @@ class NotificacionModel extends Model
     public function casosActivosSinTurno(): array
     {
         return $this->db->table('casos c')
-            ->select('
-                c.numeroTramite,
-                c.fechaInicio,
-                e.nombre,
-                e.apellido,
-                e.legajo
-            ')
-            ->join('empleados_rrhh e', 'e.legajo = c.legajo')
-            ->join('turnos t', 't.numeroTramite = c.numeroTramite', 'left')
-            ->where('c.idEstado', 2) // ACTIVO
-            ->whereIn('c.tipoCategoriaVigente', [2, 3]) // MODERADA o GRAVE
-            ->where('t.idTurno IS NULL', null, false) // sin turnos asociados
-            ->get()
-            ->getResultArray();
+        ->select('
+            c.numeroTramite,
+            c.fechaInicio,
+            e.nombre,
+            e.apellido,
+            e.legajo
+        ')
+        ->join('empleados_rrhh e', 'e.legajo = c.legajo')
+        ->join(
+            'turnos t',
+            't.numeroTramite = c.numeroTramite AND t.idEstado = 10',
+            'left'
+        )
+        ->where('c.idEstado', 2) // ACTIVO
+        ->whereIn('c.tipoCategoriaVigente', [2, 3]) // MODERADA o GRAVE
+        ->where('t.idTurno IS NULL', null, false) // sin turno pendiente
+        ->get()
+        ->getResultArray();
     }
 
     public function resolverCertificadoPendiente($legajo, $numeroTramite)
@@ -202,92 +170,6 @@ class NotificacionModel extends Model
         $builder->where('s.diasParaProximoTurno >=', $hoy);
 
         return $builder->get()->getResultArray();
-    }
-
-
-    public function turnosPendientesDeAtencionPorMedico(string $matricula): array
-    {
-        $hoy = Carbon::now()->toDateString();
-
-        $builder = $this->db->table('turnos t');
-
-        $builder->select('
-            t.idTurno,
-            t.fecha,
-            t.hora,
-            t.lugar,
-            t.motivo,
-            c.legajo,
-            e.nombre,
-            e.apellido
-        ');
-
-        $builder->join('casos c', 'c.numeroTramite = t.numeroTramite');
-        $builder->join('empleados_rrhh e', 'e.legajo = c.legajo');
-
-        $builder->where('t.matricula', $matricula);
-        $builder->where('t.fecha >', $hoy);
-        
-        // LEFT JOIN para detectar ausencia de seguimientos
-        $builder->join(
-            'seguimientos s',
-            's.idTurno = t.idTurno',
-            'left'
-        );
-
-        $builder->where('s.idTurno IS NULL', null, false); // sin turnos registrados
-
-        return $builder->get()->getResultArray();
-    }
-
-    public function turnosDisponiblesParaSeguimientoPorMedico(string $matricula): array
-    {
-        $ahora = Carbon::now();
-
-        $builder = $this->db->table('turnos t');
-
-        $builder->select('
-            t.idTurno,
-            t.numeroTramite,
-            t.fecha,
-            t.hora,
-            t.lugar,
-            c.legajo,
-            e.nombre,
-            e.apellido
-        ');
-
-        $builder->join('casos c', 'c.numeroTramite = t.numeroTramite');
-        $builder->join('empleados_rrhh e', 'e.legajo = c.legajo');
-
-        // Solo turnos del médico
-        $builder->where('t.matricula', $matricula);
-
-        // Turnos de HOY
-        $builder->where('t.fecha', $ahora->toDateString());
-
-        // Excluimos turnos con seguimiento ALTA o IRREGULAR
-        $builder->whereNotIn('t.idTurno', function ($sub) {
-            $sub->select('idTurno')
-                ->from('seguimientos')
-                ->whereIn('tipoSeguimiento', ['ALTA', 'IRREGULAR']);
-        });
-
-        $turnos = $builder->get()->getResultArray();
-
-        // Filtro horario en PHP (para no usar SQL)
-        return array_filter($turnos, function ($turno) use ($ahora) {
-
-            $fechaTurno = Carbon::parse($turno['fecha']);
-            $horaTurno  = Carbon::parse($turno['hora']);
-
-            $fechaHoraTurno = $fechaTurno->setTime($horaTurno->hour, $horaTurno->minute, 0);
-
-            $inicio = $fechaHoraTurno->copy()->subHours(6); // copy para no modificar $fechaHoraTurno
-            $fin    = $fechaHoraTurno->copy()->addHours(6);
-
-            return $ahora->between($inicio, $fin);
-        });
     }
 
     /*=================

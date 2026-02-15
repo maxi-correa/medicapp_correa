@@ -42,7 +42,6 @@ class CasoController extends BaseController
     //LISTAR TODOS LOS CASOS
     public function index()
     {   
-        $this->verificarCasos();
         $datos['casosFinalizado'] = $this->casoModel->get_casos_finalizados();
         $datos['casosPendientes'] = $this->casoModel->get_casos_pendientes();
         $datos['casosActivos'] = $this->casoModel->get_casos_activos();
@@ -127,12 +126,17 @@ class CasoController extends BaseController
             $datos['display'] = true; //MUESTRO EL BOTON
         }
 
+        /*
         $tieneTurnoActivos = $this->turnoModel->buscarTurnosActivos($numeroTramite);
-        if (empty($tieneTurnoActivos)) {
+        if (empty($tieneTurnoActivos)) { //SI NO HAY TURNOS ACTIVOS, MUESTRO EL BOTON DE ASIGNAR TURNO
             $datos['displayTurnosActivo'] = true; //MUESTRO EL BOTON
         } else {
             $datos['displayTurnosActivo'] = false; //NO MUESTRO EL BOTON
         }
+        */
+        
+        $tieneTurnoActivo = $this->turnoModel->obtenerTurnosPendientes($numeroTramite);
+        $datos['displayTurnosActivo'] = !$tieneTurnoActivo; // MUESTRO EL BOTON SI NO HAY TURNOS ACTIVOS
 
         echo view('administrador/unCaso', $datos);
     }
@@ -177,26 +181,6 @@ class CasoController extends BaseController
         $datos['datosSeguimientos'] = $this->turnoModel->obtenerTurnoSeguimiento($numeroTramite);
 
         echo view('medicoAuditor/unCaso', $datos);
-    }
-
-
-    public function verificarCasos()
-    {
-        $fechaActual = Carbon::now();
-
-        $casos = $this->casoModel
-            ->whereIn('idEstado', ['1', '2']) //PENDIENTE Y ACTIVOS
-            ->findAll();
-
-        foreach ($casos as $caso) {
-            $fechaFin = Carbon::parse($caso['fechaFin']);
-
-            if ($fechaFin <= $fechaActual) {
-                
-                // Cierra el caso y lo pasa a finalizado
-                $this->casoModel->update($caso['numeroTramite'], ['idEstado' => '3']); //FINALIZADOS
-            }
-        }
     }
 
     public function registrarCaso()

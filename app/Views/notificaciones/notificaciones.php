@@ -49,9 +49,6 @@
                     <li class="list-group-item">
                         <strong><?= esc($n['tipo']) ?></strong><br>
                         <?= esc($n['mensaje']) ?><br>
-                        <small class="text-muted">
-                            <?= date('d/m/Y H:i', strtotime($n['fecha'])) ?>
-                        </small>
                         <?php if (!empty($n['link'])): ?>
                             <div>
                                 <button class="verde" onclick="location.href='<?= $n['link'] ?>'">Ver</button>

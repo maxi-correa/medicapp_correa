@@ -31,35 +31,31 @@ class HorarioModel extends Model
 
     public function obtenerHorariosSemanalesMedico($matricula)
     {
-        $diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        $diasSemana = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
 
-    // Obtener los horarios del médico
-        $horarios = $this->where('matricula', $matricula)
-                    ->findAll();
+        $horarios = $this->where('matricula', $matricula)->findAll();
 
-    // Crear un array para asegurarnos de tener todos los días de la semana
-        $horariosConDias = [];
-
-        foreach ($diasSemana as $dia) {
-        // Buscar el horario para cada día
-            $horarioDia = null;
-            foreach ($horarios as $horario) {
-                if ($horario['diaSemana'] == $dia) {
-                    $horarioDia = $horario;
-                    break;
-                }
+        // Crear mapa por día
+        $mapa = [];
+        foreach ($horarios as $h) {
+            $mapa[$h['diaSemana']] = $h;
         }
 
-        // Si no existe horario para el día, agregar un valor vacío
-            if ($horarioDia === null) {
-                $horariosConDias[] = ['diaSemana' => $dia, 'horaInicio' => '', 'horaFin' => ''];
-            } else {
-                // Agregar el horario al array de días
-                $horariosConDias[] = $horarioDia;
-            }
-    }
+        $resultado = [];
 
-        return $horariosConDias;
+        foreach ($diasSemana as $dia) {
+            if (isset($mapa[$dia])) {
+                $resultado[] = $mapa[$dia];
+            } else {
+                $resultado[] = [
+                    'diaSemana' => $dia,
+                    'horaInicio' => '',
+                    'horaFin' => ''
+                ];
+            }
+        }
+
+        return $resultado;
     }
 
 

@@ -92,6 +92,7 @@
                         <?php endforeach; ?>
                         <th>PROPIO/FAMILIAR</th>
                         <th>FECHA DE INICIO DEL CASO</th>
+                        <th>FECHA DE CIERRE DEL CASO</th>
                         <th>MOTIVO</th>
                         <th>GRAVEDAD</th>
                         <th>LUGAR DE REPOSO</th>
@@ -107,6 +108,11 @@
                                     $fecha = new DateTime($unDato->fechaAusencia);
                                     echo $fecha->format("d/m/Y");
                                     ?></th>
+                            <th> <?php
+                                    $fecha = new DateTime($unDato->fechaFin);
+                                    echo $fecha->format("d/m/Y");
+                                ?>
+                            </th>
                             <th> <?php echo $unDato->motivo; ?></th>
                             <th><?php echo $unDato->tiposeveridad; ?></th>
                             <th><?php echo $unDato->lugarReposo; ?></th>

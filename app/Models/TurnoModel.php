@@ -126,10 +126,19 @@ class TurnoModel extends Model
         
     }
 
+    /*
     public function buscarTurnosActivos($nroTramite) {
         $sql = $this->db->query("SELECT * FROM `turnos` t 
         WHERE t.numeroTramite = ".$nroTramite." AND t.idEstado=10;");
         return $sql->getResult();
+    }
+    */
+
+    public function existeTurnoPendiente($nroTramite): bool
+    {
+        return $this->where('numeroTramite', $nroTramite)
+                    ->where('idEstado', 10)
+                    ->countAllResults() > 0;
     }
 
     public function obtenerTurnoSeguimiento($numeroTramite)
@@ -161,30 +170,44 @@ class TurnoModel extends Model
         return $resultado ? $resultado->numeroTramite : null;
     }
 
+    public function cancelarTurnos($matricula)
+    {
+        $fechaActual = date('Y-m-d');
 
-    //CANCELAR TURNOS DE UN MEDICO
-function cancelarTurnos($matricula)
-{
-    // Obtenemos la fecha actual
-    $fechaActual = date('Y-m-d'); // Si necesitas fecha y hora, usa 'Y-m-d H:i:s'
+        $builder = $this->db->table('turnos');
 
-    // Realizamos la consulta para obtener los turnos asociados a la matrícula
-    // y que tengan una fecha posterior o igual a la actual
-    $sql = "UPDATE turnos 
-            SET idEstado = 7 
-            WHERE matricula = '$matricula' 
-            AND fecha >= '$fechaActual'"; // Filtramos por matrícula y por fecha actual
+        $builder->where('matricula', $matricula);
+        $builder->where('fecha >=', $fechaActual);
+        $builder->where('idEstado', 10); // SOLO pendientes
 
-    // Ejecutamos la consulta
-    $this->db->query($sql, [$matricula, $fechaActual]);
+        $builder->update(['idEstado' => 7]);
 
-    // Verificamos cuántas filas fueron afectadas (si se actualizaron turnos)
-    if ($this->db->affectedRows() > 0) {
-        return true; // Si se han actualizado turnos
-    } else {
-        return false; // Si no se actualizó ningún turno
+        return $this->db->affectedRows() >= 0;
     }
-}
 
+    /* cancelarTurnos de Mirko
+    function cancelarTurnos($matricula)
+    {
+        // Obtenemos la fecha actual
+        $fechaActual = date('Y-m-d'); // Si necesitas fecha y hora, usa 'Y-m-d H:i:s'
+
+        // Realizamos la consulta para obtener los turnos asociados a la matrícula
+        // y que tengan una fecha posterior o igual a la actual
+        $sql = "UPDATE turnos 
+                SET idEstado = 7 
+                WHERE matricula = '$matricula' 
+                AND fecha >= '$fechaActual'"; // Filtramos por matrícula y por fecha actual
+
+        // Ejecutamos la consulta
+        $this->db->query($sql, [$matricula, $fechaActual]);
+
+        // Verificamos cuántas filas fueron afectadas (si se actualizaron turnos)
+        if ($this->db->affectedRows() > 0) {
+            return true; // Si se han actualizado turnos
+        } else {
+            return false; // Si no se actualizó ningún turno
+        }
+    }
+    */
 
 }

@@ -29,37 +29,6 @@ class NotificacionController extends BaseController
             $this->notificacionModel = new NotificacionModel();
             Carbon::setLocale('es');
         }
-    
-    /**
-     * Función de prueba
-     * Devuelve todas las notificaciones (si existe la tabla)
-     */
-    public function index()
-    {
-        if (!session()->get('isLoggedIn')) 
-        {
-            return redirect()->to('/');
-        }   
-        
-        $notificacionModel = new NotificacionModel();
-
-        $notificaciones = $notificacionModel->obtenerTodas();
-
-        // Por ahora, devolvemos JSON para debug
-        return $this->response->setJSON($notificaciones);
-    }
-
-    public function cargarEstadoNotificaciones()
-    {
-        $notificacionModel = new NotificacionModel();
-
-        $legajo = session('legajo');
-        $rol    = session('rol');
-
-        $cantidad = $notificacionModel->contarPorUsuario($legajo, $rol);
-
-        session()->set('tieneNotificaciones', $cantidad > 0);
-    }
 
     public function listar()
     {

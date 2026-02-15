@@ -13,7 +13,7 @@ class MedicoAuditorModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['nombre', 'apellido', 'dni', 'fechaNacimiento', 'gmail', 'telefono', 'especialidad', 'contrasenia'];
+    protected $allowedFields    = ['nombre', 'apellido', 'dni', 'fechaNacimiento', 'gmail', 'telefono', 'especialidad', 'contrasenia', 'habilitado'];
 
     public function hashPassword(array $data): array
     {

@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\MedicoAuditorModel;
 use App\Models\HorarioModel;
 use App\Models\TurnoModel;
+use App\Services\TurnoService;
 use CodeIgniter\HTTP\ResponseInterface;
 use Config\Mimes;
 
@@ -14,12 +15,14 @@ class MedicoAuditorController extends BaseController
     protected $medicoAuditorModel;
     protected $horarioModel;
     protected $turnoModel;
+    protected $turnoService;
 
     public function __construct()
     {
         $this->medicoAuditorModel = new MedicoAuditorModel();
         $this->horarioModel = new HorarioModel();
         $this->turnoModel = new TurnoModel();
+        $this->turnoService = new TurnoService();
     }
 
 
@@ -71,7 +74,7 @@ class MedicoAuditorController extends BaseController
             ->where('matricula', $matricula)
             ->first();
 
-        return isset($ultimoId['idHorario']) ? $ultimoId['idHorario'] + 1 : 1;
+        return isset($ultimoId['idHorario']) ? $ultimoId['idHorario'] + 1 : 1; // Si no hay horarios, empezar desde 1
     }
 
     public function guardarHorario($matricula, $dia)
@@ -300,6 +303,50 @@ class MedicoAuditorController extends BaseController
 
     public function deshabilitarMedico($matricula)
     {
+        $db = \Config\Database::connect();
+        $db->transStart();
+
+        try {
+
+            // 1. Deshabilitar médico
+            $resultadoMedico = $this->medicoAuditorModel->deshabilitarMedico($matricula);
+
+            if (!$resultadoMedico) {
+                throw new \Exception('No se pudo deshabilitar el médico.');
+            }
+
+            // 2. Cancelar turnos futuros
+            $resultadoTurnos = $this->turnoModel->cancelarTurnos($matricula);
+
+            if (!$resultadoTurnos) {
+                throw new \Exception('No se pudieron cancelar los turnos.');
+            }
+
+            $db->transComplete();
+
+            if ($db->transStatus() === false) {
+                throw new \Exception('Error en la transacción.');
+            }
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'El médico fue deshabilitado y sus turnos cancelados correctamente.'
+            ]);
+
+        } catch (\Throwable $e) {
+
+            $db->transRollback();
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /* Método de Mirko para deshabilitar un médico y cancelar sus turnos
+    public function deshabilitarMedico($matricula)
+    {
         // Llamar al modelo para deshabilitar al médico
         $resultado = $this->medicoAuditorModel->deshabilitarMedico($matricula);
 
@@ -315,7 +362,41 @@ class MedicoAuditorController extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Hubo un error al deshabilitar al médico o cancelar sus turnos.']);
         }
     }
+*/
+    public function deshabilitarMedicoTemporalmente()
+    {
+        try {
 
+            $data = $this->request->getJSON(true);
+
+            $matricula   = $data['matricula']   ?? null;
+            $fechaDesde  = $data['fechaDesde']  ?? null;
+            $fechaHasta  = $data['fechaHasta']  ?? null;
+
+            if (!$matricula || !$fechaDesde || !$fechaHasta) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Datos incompletos.'
+                ]);
+            }
+
+            $resultado = $this->turnoService->reprogramarTurnosPorAusencia($matricula, $fechaDesde, $fechaHasta);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => "Reprogramados: {$resultado['reprogramados']} - Cancelados: {$resultado['cancelados']}"
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+/* Método de Mirko para deshabilitar un médico temporalmente y reubicar sus turnos
     public function deshabilitarMedicoTemporalmente()
     {
         $json = $this->request->getJSON(); // Recibe los datos del AJAX
@@ -419,4 +500,5 @@ class MedicoAuditorController extends BaseController
 
         return $this->response->setJSON(["success" => true, "message" => "Médico deshabilitado por $dias días y turnos reubicados"]);
     }
+*/
 }

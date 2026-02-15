@@ -9,6 +9,7 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Services\NotificacionService;
+use App\Services\SistemaService;
 
 /**
  * Class BaseController
@@ -57,13 +58,15 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
-
+        
+        $sistemaService = new SistemaService();
+        $sistemaService->ejecutarTareasAutomaticas(); // Ejecutar tareas automáticas al iniciar cualquier controlador
+        
+        // Verificar si el usuario tiene un rol en la sesión antes de intentar obtener las notificaciones
         if (session()->has('rol')) {
 
             $rol = session('rol');
-
             $notificacionService = new NotificacionService();
-
             $tieneNotificaciones = $notificacionService->tieneNotificaciones($rol);
 
             session()->set('tieneNotificaciones', $tieneNotificaciones);

@@ -265,23 +265,6 @@ class TurnoController extends BaseController
         }
     }
 
-    public function verificarTurnosCaducados()
-    {
-        $fechaActual = Carbon::now()->endOfDay();
-
-        $turnosCaducados = $this->turnoModel->where('fecha <=', $fechaActual)
-            ->where('idEstado', '10') //TURNO PENDIENTE
-            ->findAll();
-
-        foreach ($turnosCaducados as $turno) {
-            foreach ($turnosCaducados as $turno) {
-                $this->turnoModel->update($turno['idTurno'], ['idEstado' => '8']);
-            }
-        }
-
-        echo "Verificación completada: Turnos cerrados si estaban caducados.";
-    }
-
     public function guardarIdTurno($idTurno)
     {
 
@@ -301,7 +284,6 @@ class TurnoController extends BaseController
         }
         
     }
-
 
 function actualizarFechaInicio($caso) {
     // Validar si existe fechaSugeridaTurno y es diferente a fechaInicio

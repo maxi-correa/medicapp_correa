@@ -176,8 +176,8 @@ class Home extends BaseController
                 $this->empleadoCategoriaModel->insert($data);
             }
         }
-        $empleadoExistente['contrasenia'] = password_hash($pass, PASSWORD_DEFAULT);
-        $this->empleadoModel->update($legajo, $empleadoExistente);
+        $empleadoExistente['contrasenia'] = password_hash($pass, PASSWORD_DEFAULT); // Encriptar la contraseña antes de guardarla
+        $this->empleadoModel->update($legajo, $empleadoExistente); // Actualizar el registro del empleado con la contraseña encriptada
 
         return redirect()->to('')
             ->with('mensaje', 'Empleado registrado con éxito.')

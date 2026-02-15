@@ -19,8 +19,8 @@ $routes->get('/registro', 'Home::registro');
 $routes->post('/registro', 'Home::registro_ingreso');
 $routes->get('error', 'Home::errorView');
 $routes->get('construccion', 'Home::construccion');
-$routes->get('verificar-turnos-caducados', 'TurnoController::verificarTurnosCaducados');
-$routes->get('verificar-casos-caducados', 'CasoController::verificarCasos');
+#$routes->get('verificar-turnos-caducados', 'TurnoController::verificarTurnosCaducados'); // Se debe escribir la ruta para que se ejecute el método de verificación de turnos caducados
+#$routes->get('verificar-casos-caducados', 'CasoController::verificarCasos'); // Se debe escribir la ruta para que se ejecute el método de verificación de casos caducados
 $routes->get('medicos/informacion/(:segment)/(:any)/vacio','MedicoAuditorController::mostrarFormularioHorario/$1/$2');
 $routes->get('medicos/informacion/(:segment)/(:any)','MedicoAuditorController::mostrarInformacionDia/$1/$2');
 $routes->get('medicos/informacion/(:segment)','MedicoAuditorController::mostrarInformacion/$1');

@@ -219,11 +219,18 @@
             <div class="modal-content">
                 <span class="close">&times;</span>
                 <h2>Deshabilitar Temporalmente</h2>
-                <label for="diasDeshabilitado">Cantidad de días:</label>
-                <input type="number" id="diasDeshabilitado" min="1" placeholder="Ingrese días">
-                <p id="errorMensaje" style="color: red; font-size: 14px; display: none;">Ingrese un número válido mayor a 0</p>
+                <label for="fechaDesde">Desde:</label>
+                <input type="date" id="fechaDesde">
+
+                <label for="fechaHasta">Hasta:</label>
+                <input type="date" id="fechaHasta">
+
+                <p id="errorMensaje" style="color: red; font-size: 14px; display: none;">
+                La fecha "Hasta" debe ser mayor o igual a "Desde"
+                </p>
                 <br>
                 <button id="confirmarTemporal" class="verde me-1" data-matricula="<?= $medico['matricula'] ?>" data-url="<?= base_url('medicos/deshabilitarTurnos') ?>/<?= $medico['matricula'] ?>">Confirmar</button>
+                <br>
                 <button id="cancelarTemporal" class="rojo me-1">Cancelar</button>
             </div>
         </div>
@@ -297,8 +304,13 @@
         var closeBtn = document.querySelector(".close");
         var cancelBtn = document.getElementById("cancelarTemporal");
         var confirmarBtn = document.getElementById("confirmarTemporal");
-        var inputDias = document.getElementById("diasDeshabilitado");
+        var fechaDesdeInput = document.getElementById("fechaDesde");
+        var fechaHastaInput = document.getElementById("fechaHasta");
         var errorMensaje = document.getElementById("errorMensaje");
+
+        // Autocompletar con hoy
+        var hoy = new Date().toISOString().split('T')[0];
+        fechaDesdeInput.value = hoy;
 
         // Abrir la modal al hacer clic en el botón
         btn.addEventListener("click", function() {
@@ -331,45 +343,42 @@
 
         // Validar la entrada antes de confirmar
         confirmarBtn.addEventListener("click", function() {
-            var dias = inputDias.value.trim(); // Eliminar espacios vacíos
-            var matricula = confirmarBtn.getAttribute("data-matricula"); // Obtener la matrícula
-            var url = "<?= base_url('medicos/deshabilitarMedicoTemporal') ?>"; // Ruta a la función en el backend
 
-            console.log(matricula);
-            console.log(dias);
+        var fechaDesde = fechaDesdeInput.value;
+        var fechaHasta = fechaHastaInput.value;
+        var matricula = confirmarBtn.getAttribute("data-matricula");
+        var url = "<?= base_url('medicos/deshabilitarMedicoTemporal') ?>";
 
-            if (dias === "" || isNaN(dias) || parseInt(dias) <= 0) {
-                errorMensaje.style.display = "block"; // Mostrar mensaje de error
+        // Validar que las fechas sean correctas
+        if (!fechaDesde || !fechaHasta || fechaHasta < fechaDesde || fechaDesde != hoy) {
+            errorMensaje.style.display = "block";
+            return;
+        }
+
+        errorMensaje.style.display = "none";
+        modal.style.display = "none";
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                matricula: matricula,
+                fechaDesde: fechaDesde,
+                fechaHasta: fechaHasta
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Médico deshabilitado correctamente");
+                location.reload();
             } else {
-                errorMensaje.style.display = "none"; // Ocultar mensaje de error
-                modal.style.display = "none"; // Cerrar modal si es válido
-
-                // Enviar solicitud AJAX
-                fetch(url, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            matricula: matricula,
-                            dias: parseInt(dias)
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("Médico deshabilitado correctamente");
-                            location.reload(); // Recargar la página
-                        } else {
-                            alert("Error: " + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error en la solicitud:", error);
-                        alert("Hubo un problema al deshabilitar al médico.");
-                    });
+                alert("Error: " + data.message);
             }
         });
+    });
     </script>
     <!-- jQuery primero, después Popper.js, luego Bootstrap JS -->
 
