@@ -231,33 +231,52 @@ class CertificadoController extends BaseController
 
     public function verImagen($legajo, $id)
     {
-        $ruta = WRITEPATH . "certificados/" . $legajo . "/" . $id;
-        if (file_exists($ruta . ".jpg")) {
-            $ruta = $ruta . ".jpg";
-        } else {
-            $ruta =  $ruta . ".png";
+        $baseRuta = WRITEPATH . "certificados/" . $legajo . "/" . $id;
+
+        $extensiones = ['jpg', 'jpeg', 'png'];
+
+        $rutaFinal = null;
+
+        foreach ($extensiones as $ext) {
+            if (file_exists($baseRuta . "." . $ext)) {
+                $rutaFinal = $baseRuta . "." . $ext;
+                break;
+            }
         }
-        $mimeType = mime_content_type($ruta);
-        header("Content-type: $mimeType");
-        readfile($ruta);
+
+        if (!$rutaFinal) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $mimeType = mime_content_type($rutaFinal);
+
+        header("Content-Type: " . $mimeType);
+        readfile($rutaFinal);
         exit;
     }
 
     public function descargarCertificado($legajo, $id)
     {
-        $ruta = WRITEPATH . "certificados/" . $legajo . "/" . $id;
+        $baseRuta = WRITEPATH . "certificados/" . $legajo . "/" . $id;
 
-        if (file_exists($ruta . ".jpg")) {
-            $ruta = $ruta . ".jpg";
-        } elseif (file_exists($ruta . ".png")) {
-            $ruta = $ruta . ".png";
+        $extensiones = ['jpg', 'jpeg', 'png'];
+
+        $rutaFinal = null;
+
+        foreach ($extensiones as $ext) {
+            if (file_exists($baseRuta . "." . $ext)) {
+                $rutaFinal = $baseRuta . "." . $ext;
+                break;
+            }
         }
 
-        $nombre = 'certificado_' . time() . "." . pathinfo($ruta, PATHINFO_EXTENSION);
+        if (!$rutaFinal) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
 
-        $data = file_get_contents($ruta);
+        $nombre = 'certificado_' . time() . "." . pathinfo($rutaFinal, PATHINFO_EXTENSION);
 
-        return $this->response->download($ruta, null)->setFileName($nombre);
+        return $this->response->download($rutaFinal, null)->setFileName($nombre);
     }
 
     public function guardarImagen($ruta, $nuevoID, $archivoCertificado)

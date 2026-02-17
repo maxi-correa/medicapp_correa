@@ -92,25 +92,52 @@ class NotificacionModel extends Model
 
     public function casosActivosSinTurno(): array
     {
-        return $this->db->table('casos c')
-        ->select('
+        $builder = $this->db->table('casos c');
+
+        $builder->select('
             c.numeroTramite,
             c.fechaInicio,
             e.nombre,
             e.apellido,
             e.legajo
-        ')
-        ->join('empleados_rrhh e', 'e.legajo = c.legajo')
-        ->join(
-            'turnos t',
-            't.numeroTramite = c.numeroTramite AND t.idEstado = 10',
-            'left'
-        )
-        ->where('c.idEstado', 2) // ACTIVO
-        ->whereIn('c.tipoCategoriaVigente', [2, 3]) // MODERADA o GRAVE
-        ->where('t.idTurno IS NULL', null, false) // sin turno pendiente
-        ->get()
-        ->getResultArray();
+        ');
+
+        $builder->join('empleados_rrhh e', 'e.legajo = c.legajo');
+        
+        $builder->where('c.idEstado', 2);
+        $builder->whereIn('c.tipoCategoriaVigente', [2, 3]);
+
+        $builder->where("
+            (
+                NOT EXISTS (
+                    SELECT 1 FROM turnos t
+                    WHERE t.numeroTramite = c.numeroTramite
+                )
+                OR
+                (
+                    SELECT t2.idEstado
+                    FROM turnos t2
+                    WHERE t2.numeroTramite = c.numeroTramite
+                    ORDER BY t2.idTurno DESC
+                    LIMIT 1
+                ) IN (7, 8)
+            )
+            AND
+            NOT EXISTS (
+                SELECT 1
+                FROM turnos t3
+                JOIN seguimientos s ON s.idTurno = t3.idTurno
+                WHERE t3.numeroTramite = c.numeroTramite
+                AND s.idSeguimiento = (
+                    SELECT MAX(s2.idSeguimiento)
+                    FROM seguimientos s2
+                    WHERE s2.idTurno = t3.idTurno
+                )
+                AND s.tipoSeguimiento = 'ALTA'
+            )
+        ", null, false);
+
+        return $builder->get()->getResultArray();
     }
 
     public function resolverCertificadoPendiente($legajo, $numeroTramite)
@@ -201,6 +228,8 @@ class NotificacionModel extends Model
 
         // Hoy en adelante
         $builder->where('t.fecha >=', $ahora->toDateString());
+
+        $builder->where('c.idEstado', 2); // Solo casos activos
 
         // Excluir turnos que ya tengan seguimiento
         $builder->join('seguimientos s', 's.idTurno = t.idTurno', 'left');

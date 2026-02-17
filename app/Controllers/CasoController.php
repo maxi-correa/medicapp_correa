@@ -120,11 +120,8 @@ class CasoController extends BaseController
 
 
         $tieneCertificadosModeradosComplejos = $this->certificadoModel->buscarCertificadosDeGravedad($numeroTramite);
-        if (empty($tieneCertificadosModeradosComplejos)) {
-            $datos['display'] = false; //NO MUESTRO EL BOTON
-        } else {
-            $datos['display'] = true; //MUESTRO EL BOTON
-        }
+
+        $datos['display'] = !empty($tieneCertificadosModeradosComplejos); // MUESTRO EL BOTON SI HAY CERTIFICADOS DE GRAVEDAD MODERADA O COMPLEJA y SI ESTÁ JUSTIFICADO
 
         /*
         $tieneTurnoActivos = $this->turnoModel->buscarTurnosActivos($numeroTramite);

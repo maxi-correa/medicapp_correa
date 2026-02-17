@@ -58,6 +58,30 @@
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
+
+        <?php if ($totalPaginas > 1): ?>
+            <nav class="mt-4 d-flex justify-content-center">
+                <ul class="pagination">
+
+                    <!-- Botón Anterior -->
+                    <li class="page-item <?= ($paginaActual <= 1) ? 'disabled' : '' ?>">
+                        <a class="page-link"
+                        href="?page=<?= $paginaActual - 1 ?>">
+                            ◀ Anterior
+                        </a>
+                    </li>
+
+                    <!-- Botón Siguiente -->
+                    <li class="page-item <?= ($paginaActual >= $totalPaginas) ? 'disabled' : '' ?>">
+                        <a class="page-link"
+                        href="?page=<?= $paginaActual + 1 ?>">
+                            Siguiente ▶
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        <?php endif; ?>
     </main>
 
     <?= view('templates/footer'); ?>
@@ -67,7 +91,6 @@
 <!-- jQuery primero, después Popper.js, luego Bootstrap JS -->
 <script src="<?= base_url('assets/js/jquery.min.js'); ?>"></script>
 <script src="<?= base_url('assets/js/popper.min.js'); ?>"></script>
-<script src="<?= base_url('assets/js/bootstrap.js'); ?>"></script>
-<script src="<?= base_url('assets/js/bootstrap.min.js'); ?>"></script>
+<script src="<?= base_url('assets/js/bootstrap.bundle.min.js'); ?>"></script>
 
 </html>

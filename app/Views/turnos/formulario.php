@@ -234,7 +234,7 @@
                             data.horarios.forEach(horario => {
                                 const option = document.createElement("option");
                                 option.value = horario.id;
-                                option.textContent = `${horario.horaInicio} - ${horario.horaFin}`;
+                                option.textContent = `${horario.horaInicio} - ${horario.horaFin} hs`;
                                 horarioSelect.appendChild(option);
                             });
                         } else if (data.error) {

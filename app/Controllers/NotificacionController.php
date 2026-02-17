@@ -35,11 +35,25 @@ class NotificacionController extends BaseController
         $rol = session('rol');
 
         $service = new NotificacionService();
-
         $notificaciones = $service->obtenerNotificaciones($rol);
 
+        $porPagina = 3;
+        $pagina = (int) ($this->request->getGet('page') ?? 1);
+
+        $total = count($notificaciones);
+        $totalPaginas = ceil($total / $porPagina);
+
+        // evitar página inválida
+        if ($pagina < 1) $pagina = 1;
+        if ($pagina > $totalPaginas) $pagina = $totalPaginas;
+
+        $inicio = ($pagina - 1) * $porPagina;
+        $notificacionesPagina = array_slice($notificaciones, $inicio, $porPagina);
+
         return view('notificaciones/notificaciones', [
-            'notificaciones' => $notificaciones
+            'notificaciones' => $notificacionesPagina,
+            'paginaActual'   => $pagina,
+            'totalPaginas'   => $totalPaginas
         ]);
     }
 }

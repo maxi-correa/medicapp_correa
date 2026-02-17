@@ -113,6 +113,104 @@ class TurnoService
     | Intentar reasignar un turno
     |--------------------------------------------------------------------------
     */
+    
+    private function intentarReasignacion(array $turno, array $medicos): bool
+    {
+        $fechaOriginal = Carbon::parse($turno['fecha']);
+        $hoy = Carbon::today();
+
+        $fechasABuscar = [];
+
+        // Siempre intentar mismo día primero
+        $fechasABuscar[] = $fechaOriginal->copy();
+
+        // Luego solo el día siguiente
+        $fechasABuscar[] = $fechaOriginal->copy()->addDay();
+
+        foreach ($fechasABuscar as $fechaBusqueda) {
+
+            $fechaActual = $fechaBusqueda->format('Y-m-d');
+            $diaSemana = $this->obtenerNombreDia($fechaActual);
+
+            // 🔎 Validar caso
+            $caso = $this->casoModel
+                ->where('numeroTramite', $turno['numeroTramite'])
+                ->first();
+
+            if (!$caso || $caso['idEstado'] != 2) {
+                continue;
+            }
+
+            // Validación correcta de fechaFin
+            if (!empty($caso['fechaFin'])) {
+                $fechaFin = Carbon::parse($caso['fechaFin'])->endOfDay();
+                $fechaBusquedaCarbon = Carbon::parse($fechaActual)->startOfDay();
+
+                if ($fechaBusquedaCarbon->gt($fechaFin)) {
+                    continue;
+                }
+            }
+
+            /*
+            ==========================================
+            PASO 1: MISMA HORA, OTRO MÉDICO
+            ==========================================
+            */
+
+            foreach ($medicos as $medico) {
+
+                $ocupado = $this->turnoModel
+                    ->where('matricula', $medico['matricula'])
+                    ->where('fecha', $fechaActual)
+                    ->where('hora', $turno['hora'])
+                    ->first();
+
+                if (!$ocupado) {
+
+                    return $this->crearReprogramacion($turno, $medico, $fechaActual, $turno['hora']);
+                }
+            }
+
+            /*
+            ==========================================
+            PASO 2: MISMA FECHA, OTRO HORARIO
+            ==========================================
+            */
+
+            $medicosOrdenados = $this->ordenarMedicosPorCarga($medicos, $fechaActual, $diaSemana);
+
+            foreach ($medicosOrdenados as $medico) {
+
+                $horarios = $this->horarioModel
+                    ->where('matricula', $medico['matricula'])
+                    ->where('diaSemana', $diaSemana)
+                    ->findAll();
+
+                foreach ($horarios as $horario) {
+
+                    $bloques = $this->generarBloques($horario);
+
+                    foreach ($bloques as $hora) {
+
+                        $ocupado = $this->turnoModel
+                            ->where('matricula', $medico['matricula'])
+                            ->where('fecha', $fechaActual)
+                            ->where('hora', $hora)
+                            ->first();
+
+                        if (!$ocupado) {
+
+                            return $this->crearReprogramacion($turno, $medico, $fechaActual, $hora);
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /*
     private function intentarReasignacion(array $turno, array $medicos): bool
     {
         $fechaInicioBusqueda = Carbon::parse($turno['fecha'])->addDay();
@@ -162,6 +260,11 @@ class TurnoService
                                 'idEstado' => 10 // Pendiente
                             ]);
 
+                            // Actualizar fecha sugerida en caso
+                            $this->casoModel->update($turno['numeroTramite'], [
+                                'fechaSugeridaTurno' => $fechaActual,
+                            ]);
+
                             return true;
                         }
                     }
@@ -172,6 +275,35 @@ class TurnoService
         }
 
         return false;
+    }
+   */
+  
+    /*
+    |--------------------------------------------------------------------------
+    | Crear reprogramación
+    |--------------------------------------------------------------------------
+    */
+    private function crearReprogramacion($turno, $medico, $fecha, $hora)
+    {
+        $this->turnoModel->update($turno['idTurno'], [
+            'idEstado' => 9
+        ]);
+
+        $this->turnoModel->insert([
+            'fecha' => $fecha,
+            'hora' => $hora,
+            'lugar' => $turno['lugar'],
+            'motivo' => $turno['motivo'],
+            'numeroTramite' => $turno['numeroTramite'],
+            'matricula' => $medico['matricula'],
+            'idEstado' => 10
+        ]);
+
+        $this->casoModel->update($turno['numeroTramite'], [
+            'fechaSugeridaTurno' => $fecha
+        ]);
+
+        return true;
     }
 
     /*

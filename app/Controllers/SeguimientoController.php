@@ -139,6 +139,32 @@ class SeguimientoController extends BaseController
         }
         if ($tipoSeguimiento === $valoresEnum[1]) //IRREGULAR
         {
+        
+            // Devolución de días
+            $diasDisponibles += $diferenciaDiasConIncluidos;
+            $categoriaEmpleado['diasDisponibles'] = $diasDisponibles;
+            $this->categoriaEmpleadoModel->update($id, $categoriaEmpleado);
+
+            // Marcar certificado como irregular
+            $certificado['idEstado'] = 4;
+            $certificado['descripcion'] = 'IRREGULAR';
+            $this->certificadoModel->update($certificado['idCertificado'], $certificado);
+
+            // Finalizar turno
+            $this->turnoModel->update($turno['idTurno'], ['idEstado' => 8]);
+
+            // Cerrar caso y actualizar fechaFin
+            $this->casoModel->update($turno['numeroTramite'], [
+                'idEstado' => 3,
+                'fechaFin' => $fechaSeguimiento
+            ]);
+
+            // Guardar seguimiento
+            $this->seguimientoModel->insert($data);
+
+            return redirect()->to('visualizarCasoM')->with('success', 'Seguimiento guardado correctamente.');
+
+        /*
             $diasDisponibles += $diferenciaDiasConIncluidos;
             $categoriaEmpleado['diasDisponibles'] = $diasDisponibles;
             $this->categoriaEmpleadoModel->update($id, $categoriaEmpleado);
@@ -150,6 +176,7 @@ class SeguimientoController extends BaseController
             $this->casoModel->update($caso['numeroTramite'], $caso);
             $this->seguimientoModel->insert($data);
             return redirect()->to('visualizarCasoM')->with('success', 'Seguimiento guardado correctamente.');
+        */
         }
         if ($tipoSeguimiento === $valoresEnum[2]) //PROXIMO TURNO
         {
@@ -162,7 +189,7 @@ class SeguimientoController extends BaseController
         if ($tipoSeguimiento === $valoresEnum[3]) // EXTENDER PLAZO 
         {
             $this->casoModel->update($turno['numeroTramite'], ['fechaFin' => $fechaSeguimiento]);
-            $this->casoModel->update($caso['idEstado'], ['idEstado' => 3]);
+            //$this->casoModel->update($caso['idEstado'], ['idEstado' => 3]); Está mal, no se debe cerrar el caso, solo extender el plazo
             $this->turnoModel->update($turno['idTurno'], ['idEstado'=> 8]);
             $this->seguimientoModel->insert($data);
             return redirect()->to('visualizarCasoM')->with('success', 'Seguimiento guardado correctamente.');

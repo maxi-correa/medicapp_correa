@@ -69,6 +69,96 @@
         .modal-backdrop {
             display: none !important;
         }
+
+        /* Overlay */
+    .modal-custom {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(3px);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* Caja modal */
+    .modal-box {
+        background: #ffffff;
+        width: 420px;
+        border-radius: 12px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        animation: fadeInScale 0.2s ease-out;
+    }
+
+    /* Animación suave */
+    @keyframes fadeInScale {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .form-group-modal {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+
+    .form-group-modal label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .input-normal,
+    .input-readonly {
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .input-readonly {
+        background-color: #f1f1f1;
+        color: #666;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    .error-text {
+        display: none;
+        font-size: 13px;
+        color: #d9534f;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .close {
+        font-size: 20px;
+        cursor: pointer;
+    }
+
     </style>
 </head>
 
@@ -214,28 +304,67 @@
 
         </div>
 
-        <!-- Modal -->
-        <div id="modalDeshabilitar" class="modal">
+        <!-- Modal Confirmar Deshabilitación Permanente -->
+        <div class="modal fade" id="modalConfirmarDeshabilitar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
+
+            <div class="modal-header">
+                <h3>Deshabilitar Médico</h3>
                 <span class="close">&times;</span>
-                <h2>Deshabilitar Temporalmente</h2>
-                <label for="fechaDesde">Desde:</label>
-                <input type="date" id="fechaDesde">
+            </div>
 
-                <label for="fechaHasta">Hasta:</label>
-                <input type="date" id="fechaHasta">
+            <div class="modal-body text-center">
+                <p>¿Está seguro que desea deshabilitar permanentemente al médico?</p>
+            </div>
 
-                <p id="errorMensaje" style="color: red; font-size: 14px; display: none;">
-                La fecha "Hasta" debe ser mayor o igual a "Desde"
-                </p>
-                <br>
-                <button id="confirmarTemporal" class="verde me-1" data-matricula="<?= $medico['matricula'] ?>" data-url="<?= base_url('medicos/deshabilitarTurnos') ?>/<?= $medico['matricula'] ?>">Confirmar</button>
-                <br>
-                <button id="cancelarTemporal" class="rojo me-1">Cancelar</button>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="rojo" data-bs-dismiss="modal">
+                Cancelar
+                </button>
+                <button type="button" id="btnConfirmarDeshabilitacion" class="verde">
+                    Confirmar
+                </button>
+            </div>
+
             </div>
         </div>
+        </div>
 
+        <!-- Modal deshabilitar temporalmente -->
+        <div id="modalDeshabilitar" class="modal-custom">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3>Deshabilitar Médico Temporalmente</h3>
+                    <span class="close">&times;</span>
+                </div>
 
+                <div class="modal-body">
+                    <div class="form-group-modal">
+                        <label>Desde</label>
+                        <input type="date" id="fechaDesde" class="input-readonly" readonly>
+                    </div>
+
+                    <div class="form-group-modal">
+                        <label>Hasta</label>
+                        <input type="date" id="fechaHasta" class="input-normal">
+                    </div>
+
+                    <p id="errorMensaje" class="error-text">
+                        La fecha "Hasta" debe ser mayor o igual a "Desde"
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button id="cancelarTemporal" class="rojo">Cancelar</button>
+                    <button id="confirmarTemporal" class="verde"
+                        data-matricula="<?= $medico['matricula'] ?>"
+                        data-url="<?= base_url('medicos/deshabilitarTurnos') ?>/<?= $medico['matricula'] ?>">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
 
     </main>
     <!--###################################################################################################################################-->
@@ -243,140 +372,161 @@
     <?= view('templates/footer'); ?>
 
     <script>
-        var mensajeContenedor = document.getElementById('mensajeContenedor'); // Contenedor con id 'mensajeContenedor'
+    document.addEventListener("DOMContentLoaded", function () {
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Obtener el valor de 'habilitado' del médico
-            var habilitado = "<?= $medico['habilitado'] ?>"; // Obtener el valor de 'habilitado' desde PHP
-            console.log('Valor de habilitado:', habilitado); // Verificar en la consola
-            // Ocultar todos los contenedores
-            document.getElementById('habilitarContenedor').style.display = 'none';
-            document.getElementById('deshabilitarContenedor').style.display = 'none';
+        /* =====================================================
+        1️⃣ Mostrar contenedores según estado del médico
+        ===================================================== */
 
-            console.log('habilitarContenedor:', document.getElementById('habilitarContenedor'));
-            console.log('deshabilitarContenedor:', document.getElementById('deshabilitarContenedor'));
+        const habilitado = "<?= $medico['habilitado'] ?>";
 
-            // Mostrar el contenedor correspondiente según el valor de 'habilitado'
-            if (habilitado == '0') {
-                // El médico está habilitado, mostrar la opción para deshabilitar
-                document.getElementById('deshabilitarContenedor').style.display = 'block';
-            } else if (habilitado == '1') {
-                // El médico está deshabilitado, mostrar la opción para habilitar
-                document.getElementById('habilitarContenedor').style.display = 'block';
+        const habilitarContenedor = document.getElementById('habilitarContenedor');
+        const deshabilitarContenedor = document.getElementById('deshabilitarContenedor');
+
+        habilitarContenedor.style.display = 'none';
+        deshabilitarContenedor.style.display = 'none';
+
+        if (habilitado == '0') {
+            deshabilitarContenedor.style.display = 'block';
+        } else if (habilitado == '1') {
+            habilitarContenedor.style.display = 'block';
+        }
+
+        /* =====================================================
+        2️⃣ Habilitar médico (AJAX)
+        ===================================================== */
+
+        const btnHabilitar = document.getElementById('btnHabilitar');
+
+        if (btnHabilitar) {
+            btnHabilitar.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const url = this.getAttribute('data-url');
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error del servidor');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error: " + error.message);
+                    });
+            });
+        }
+
+        /* =====================================================
+        3️⃣ Modal deshabilitación temporal
+        ===================================================== */
+
+        const modalTemporal = document.getElementById("modalDeshabilitar");
+        const btnTemporal = document.getElementById("btnt");
+        const closeBtn = document.querySelector(".close");
+        const cancelBtn = document.getElementById("cancelarTemporal");
+        const confirmarBtn = document.getElementById("confirmarTemporal");
+        const fechaDesdeInput = document.getElementById("fechaDesde");
+        const fechaHastaInput = document.getElementById("fechaHasta");
+        const errorMensaje = document.getElementById("errorMensaje");
+
+        const hoy = new Date().toISOString().split('T')[0];
+        fechaDesdeInput.value = hoy;
+
+        btnTemporal.addEventListener("click", function () {
+            modalTemporal.style.display = "flex";
+        });
+
+        closeBtn.addEventListener("click", function () {
+            modalTemporal.style.display = "none";
+        });
+
+        cancelBtn.addEventListener("click", function () {
+            modalTemporal.style.display = "none";
+        });
+
+        window.addEventListener("click", function (event) {
+            if (event.target === modalTemporal) {
+                modalTemporal.style.display = "none";
             }
         });
 
+        confirmarBtn.addEventListener("click", function () {
 
-        document.getElementById('btnHabilitar').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevenir que el enlace navegue a otra página
+            const fechaDesde = fechaDesdeInput.value;
+            const fechaHasta = fechaHastaInput.value;
+            const matricula = confirmarBtn.getAttribute("data-matricula");
+            const url = "<?= base_url('medicos/deshabilitarMedicoTemporal') ?>";
 
-            var matricula = this.getAttribute('data-matricula'); // Obtener la matrícula desde el atributo data-matricula
-            var url = this.getAttribute('data-url'); // Obtener la URL desde el atributo data-url
+            if (!fechaDesde || !fechaHasta || fechaHasta < fechaDesde || fechaDesde != hoy) {
+                errorMensaje.style.display = "block";
+                return;
+            }
 
-            // Realizar la solicitud AJAX
-            fetch(url)
-                .then(response => {
-                    // Verifica el status de la respuesta (por ejemplo, 200 OK)
-                    console.log(response); // Depuración de la respuesta
-                    if (!response.ok) {
-                        throw new Error('Error en la respuesta del servidor');
-                    }
-                    return response.json(); // Convertir la respuesta en JSON
+            errorMensaje.style.display = "none";
+            modalTemporal.style.display = "none";
+
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    matricula: matricula,
+                    fechaDesde: fechaDesde,
+                    fechaHasta: fechaHasta
                 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Médico deshabilitado correctamente");
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+
+        /* =====================================================
+        4️⃣ Modal deshabilitación permanente (Bootstrap)
+        ===================================================== */
+
+        const botonDeshabilitar = document.getElementById("btna");
+        const btnConfirmar = document.getElementById("btnConfirmarDeshabilitacion");
+        const modalElement = document.getElementById("modalConfirmarDeshabilitar");
+        const modalBootstrap = new bootstrap.Modal(modalElement);
+
+        let urlDeshabilitar = "";
+
+        botonDeshabilitar.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // 🔴 más fuerte que stopPropagation
+
+            urlDeshabilitar = this.getAttribute("data-url");
+
+            modalBootstrap.show();
+        });
+
+        btnConfirmar.addEventListener("click", function () {
+
+            fetch(urlDeshabilitar)
+                .then(response => response.json())
                 .then(data => {
-                    console.log(data); // Depuración del JSON recibido
                     if (data.success) {
+                        modalBootstrap.hide();
                         location.reload();
                     } else {
-                        alert("Hubo un error al habilitar al médico: " + data.message);
+                        alert("Error: " + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error); // Mostramos el error en consola
-                    alert("Error en la solicitud: " + error.message);
+                    alert("Error: " + error.message);
                 });
-        });
 
-
-
-        var modal = document.getElementById("modalDeshabilitar");
-        var btn = document.getElementById("btnt");
-        var closeBtn = document.querySelector(".close");
-        var cancelBtn = document.getElementById("cancelarTemporal");
-        var confirmarBtn = document.getElementById("confirmarTemporal");
-        var fechaDesdeInput = document.getElementById("fechaDesde");
-        var fechaHastaInput = document.getElementById("fechaHasta");
-        var errorMensaje = document.getElementById("errorMensaje");
-
-        // Autocompletar con hoy
-        var hoy = new Date().toISOString().split('T')[0];
-        fechaDesdeInput.value = hoy;
-
-        // Abrir la modal al hacer clic en el botón
-        btn.addEventListener("click", function() {
-            modal.style.display = "block";
-        });
-
-        // Cerrar la modal al hacer clic en la "X"
-        closeBtn.addEventListener("click", function() {
-            modal.style.display = "none";
-        });
-
-        // Cerrar la modal al hacer clic en "Cancelar"
-        cancelBtn.addEventListener("click", function() {
-            modal.style.display = "none";
-        });
-
-        // Cerrar la modal si el usuario hace clic fuera de ella
-        window.addEventListener("click", function(event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        });
-
-        // Cerrar la modal si el usuario hace clic fuera de ella
-        window.addEventListener("click", function(event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        });
-
-        // Validar la entrada antes de confirmar
-        confirmarBtn.addEventListener("click", function() {
-
-        var fechaDesde = fechaDesdeInput.value;
-        var fechaHasta = fechaHastaInput.value;
-        var matricula = confirmarBtn.getAttribute("data-matricula");
-        var url = "<?= base_url('medicos/deshabilitarMedicoTemporal') ?>";
-
-        // Validar que las fechas sean correctas
-        if (!fechaDesde || !fechaHasta || fechaHasta < fechaDesde || fechaDesde != hoy) {
-            errorMensaje.style.display = "block";
-            return;
-        }
-
-        errorMensaje.style.display = "none";
-        modal.style.display = "none";
-
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                matricula: matricula,
-                fechaDesde: fechaDesde,
-                fechaHasta: fechaHasta
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Médico deshabilitado correctamente");
-                location.reload();
-            } else {
-                alert("Error: " + data.message);
-            }
         });
     });
     </script>

@@ -54,10 +54,15 @@ class CertificadoModel extends Model
     }
 
     public function buscarCertificadosDeGravedad($nroTramite) {
-        $sql = $this->db->query("SELECT * FROM `certificados` c INNER JOIN enfermedades e on e.codEnfermedad = c.codEnfermedad 
-        LEFT JOIN tipos_categorias tc on tc.idCategoria = e.idCategoria 
-        WHERE tc.tiposeveridad!='Simple' AND c.numeroTramite =".$nroTramite);
-        return $sql->getResult();
+        return $this->db->table('certificados c')
+        ->select('*')
+        ->join('enfermedades e', 'e.codEnfermedad = c.codEnfermedad')
+        ->join('tipos_categorias tc', 'tc.idCategoria = e.idCategoria', 'left')
+        ->where('tc.tiposeveridad !=', 'Simple')
+        ->where('c.idEstado', 5)
+        ->where('c.numeroTramite', $nroTramite)
+        ->get()
+        ->getResult();
     }
 
     

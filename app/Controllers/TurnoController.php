@@ -157,24 +157,58 @@ class TurnoController extends BaseController
         ];
 
         $horariosDiaEspeficico = $this->horarioModel->obtenerHorarioDiaEspecifico($matricula, $dia);
+
         if (empty($horariosDiaEspeficico)) {
             return $this->response->setJSON([
                 'trabaja' => 'No trabaja los ' . $dia,
             ]);
-        } else {
-            $horarios = $this->obtenerTurnosLibres($matricula, $fecha, $horariosDiaEspeficico, 10);
-            if (empty($horarios)) {
-                return $this->response->setJSON([
-                    'error' => 'No hay horarios disponibles'
-                ]);
+        }
+
+        $horarios = $this->obtenerTurnosLibres($matricula, $fecha, $horariosDiaEspeficico, 10);
+
+        if (empty($horarios)) {
+            return $this->response->setJSON([
+                'error' => 'No hay horarios disponibles'
+            ]);
+        }
+
+        
+        // FILTRO POR HORA ACTUAL
+        $fechaSeleccionada = Carbon::parse($fecha);
+        $ahora = Carbon::now()->add(5, 'minutes'); // Agrega un margen de 5 minutos para evitar mostrar turnos que están por comenzar
+        
+        $horariosFiltrados = [];
+
+        foreach ($horarios as $horario) {
+
+            $horaInicio = Carbon::parse($fecha . ' ' . $horario['horaInicio']);
+
+            // Si es hoy → mostrar solo los futuros
+            if ($fechaSeleccionada->isToday()) {
+
+                if ($horaInicio->greaterThan($ahora)) {
+                    $horariosFiltrados[] = $horario;
+                }
+
             } else {
-                return $this->response->setJSON([
-                    'success' => true,
-                    'horarios' => $horarios,
-                    'datos' => $datosTurno,
-                ]);
+                // Si es fecha futura → mostrar todos
+                if ($fechaSeleccionada->isFuture()) {
+                    $horariosFiltrados[] = $horario;
+                }
             }
         }
+
+        if (empty($horariosFiltrados)) {
+            return $this->response->setJSON([
+                'error' => 'No hay horarios disponibles para el resto del día'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'horarios' => $horariosFiltrados,
+            'datos' => $datosTurno,
+        ]);
     }
 
     private function obtenerFechaTurno()
@@ -239,22 +273,30 @@ class TurnoController extends BaseController
     private function obtenerTurnosLibres($matricula, $fechaTurno, $horariosDiaEspeficico, $tope)
     {
         $turnos = [];
+
         foreach ($horariosDiaEspeficico as $horario) {
+
             $horaInicio = Carbon::parse($horario['horaInicio']);
-            $horaFin =  Carbon::parse($horario['horaFin']);
+            $horaFin = Carbon::parse($horario['horaFin']);
             $duracion = (int) $horario['duracion'];
+
             while ($horaInicio < $horaFin) {
+
                 if (!$this->turnoModel->verSiHayTurnoEnEseHorario($matricula, $fechaTurno, $horaInicio)) {
+
                     $horaFinTurno = $horaInicio->copy()->addMinutes($duracion);
+
                     $turnos[] = [
-                        'id' => $horaInicio->toTimeString(),
-                        'horaInicio' => $horaInicio->format('G:i') . ' hs',
-                        'horaFin' => $horaFinTurno->format('G:i') . ' hs',
+                        'id' => $horaInicio->format('H:i:s'), // 🔹 valor real para guardar
+                        'horaInicio' => $horaInicio->format('H:i'), // 🔹 limpio
+                        'horaFin' => $horaFinTurno->format('H:i'),  // 🔹 limpio
                     ];
                 }
+
                 $horaInicio->addMinutes($duracion);
             }
         }
+
         return $turnos;
     }
 
