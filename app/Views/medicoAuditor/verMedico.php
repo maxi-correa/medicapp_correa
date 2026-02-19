@@ -256,8 +256,8 @@
                         <tbody>
                             <?php foreach ($turnosMed as $turno): ?>
                                 <tr>
-                                    <td><?= esc($turno['fecha']); ?></td>
-                                    <td><?= esc($turno['hora']); ?></td>
+                                    <td><?= date('d-m-Y', strtotime($turno['fecha'])); ?></td>
+                                    <td><?= date('H:i', strtotime($turno['hora'])); ?></td>
                                     <td><?= esc($turno['lugar']); ?></td>
                                     <td><?= esc($turno['motivo']); ?></td>
                                     <td><?= esc($turno['numeroTramite']); ?></td>
@@ -342,7 +342,7 @@
                 <div class="modal-body">
                     <div class="form-group-modal">
                         <label>Desde</label>
-                        <input type="date" id="fechaDesde" class="input-readonly" readonly>
+                        <input type="date" id="fechaDesde" class="input-normal">
                     </div>
 
                     <div class="form-group-modal">
@@ -351,7 +351,8 @@
                     </div>
 
                     <p id="errorMensaje" class="error-text">
-                        La fecha "Hasta" debe ser mayor o igual a "Desde"
+                    La fecha "Desde" no pude ser menor a la fecha actual.<br>    
+                    La fecha "Hasta" debe ser mayor o igual a "Desde"
                     </p>
                 </div>
 
@@ -463,7 +464,7 @@
             const matricula = confirmarBtn.getAttribute("data-matricula");
             const url = "<?= base_url('medicos/deshabilitarMedicoTemporal') ?>";
 
-            if (!fechaDesde || !fechaHasta || fechaHasta < fechaDesde || fechaDesde != hoy) {
+            if (!fechaDesde || !fechaHasta || fechaHasta < fechaDesde || fechaDesde < hoy) {
                 errorMensaje.style.display = "block";
                 return;
             }
